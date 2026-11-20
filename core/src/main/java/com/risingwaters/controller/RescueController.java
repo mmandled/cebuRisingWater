@@ -4,8 +4,9 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.risingwaters.model.Civilian;
+import com.risingwaters.model.RescueBoat;
 
-/** Coordinates foot escorts. Boat rescues will be implemented separately. */
+// Handles civilians following the player and riding the boat.
 public final class RescueController {
     public static final float INTERACTION_RANGE = 84f;
     private final Array<Civilian> civilians;
@@ -57,6 +58,34 @@ public final class RescueController {
         }
     }
 
+    public Civilian nearestBoatRescue(float x, float y) {
+        Civilian nearest = null;
+        float best = INTERACTION_RANGE * INTERACTION_RANGE;
+        for (Civilian c : civilians) {
+            if (!c.isWaiting() || !c.requiresBoat()) continue;
+            float d = c.getPosition().dst2(x, y);
+            if (d <= best) { nearest = c; best = d; }
+        }
+        return nearest;
+    }
+
+    public void pickUpByBoat(RescueBoat boat) {
+        Civilian civilian = nearestBoatRescue(boat.getPosition().x, boat.getPosition().y);
+        if (civilian == null) { message = "No stranded civilian close to the boat."; return; }
+        if (!boat.hasRoom()) { message = "Boat is full. Return to shore."; return; }
+        if (boat.board(civilian)) message = civilian.getId() + " boarded the boat.";
+    }
+
+    public void unloadFromBoat(RescueBoat boat, float x, float y) {
+        if (escorted != null) { message = "Evacuate your current civilian first."; return; }
+        Civilian civilian = boat.unloadOne();
+        if (civilian == null) { message = "No passengers to unload."; return; }
+        escorted = civilian;
+        escorted.follow(x - 22f, y - 22f);
+        message = "Escort " + civilian.getId() + " to the evacuation playground.";
+    }
+
+    public boolean isEscorting() { return escorted != null; }
     public Civilian getEscorted() { return escorted; }
     public String getMessage() { return message; }
     public int getEvacuatedCount() {

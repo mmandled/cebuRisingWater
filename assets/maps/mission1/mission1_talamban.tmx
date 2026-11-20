@@ -1,18 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="40" height="24" tilewidth="48" tileheight="48" infinite="0" nextlayerid="14" nextobjectid="32">
- <tileset firstgid="1" source="../../tilesets/urban/A2_Modern_City_Rasak.tsx"/>
- <tileset firstgid="193" source="../../tilesets/urban/A3_Modern_Outside_Rasak.tsx"/>
- <tileset firstgid="321" source="../../tilesets/urban/A4_Modern_Outside_Rasak.tsx"/>
- <tileset firstgid="561" source="../../tilesets/urban/A5_Modern_Outside_Rasak.tsx"/>
- <tileset firstgid="689" source="../../tilesets/urban/Tileset_Modern_BuildingExtras.tsx"/>
- <tileset firstgid="945" source="../../tilesets/urban/Tileset_Modern_CityShopping_Rasak.tsx"/>
- <tileset firstgid="1201" source="../../tilesets/urban/Tileset_Modern_Garbage_Rasak.tsx"/>
- <tileset firstgid="1457" source="../../tilesets/urban/Tileset_Modern_Park_Rasak.tsx"/>
- <tileset firstgid="1713" source="../../tilesets/urban/Tileset_Modern_PublicTransportation_Clean_Rasak.tsx"/>
- <tileset firstgid="1969" source="../../tilesets/urban/Tileset_Modern_Street_Rasak.tsx"/>
- <tileset firstgid="2225" source="../../tilesets/urban/A1_Modern_Outside_Rasak.tsx"/>
- <layer id="1" name="Ground" width="40" height="24">
-  <data encoding="csv">
+<?xml version='1.0' encoding='UTF-8'?>
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="40" height="24" tilewidth="48" tileheight="48" infinite="0" nextlayerid="15" nextobjectid="33">
+  <tileset firstgid="1" source="../../tilesets/urban/A2_Modern_City_Rasak.tsx" />
+  <tileset firstgid="193" source="../../tilesets/urban/A3_Modern_Outside_Rasak.tsx" />
+  <tileset firstgid="321" source="../../tilesets/urban/A4_Modern_Outside_Rasak.tsx" />
+  <tileset firstgid="561" source="../../tilesets/urban/A5_Modern_Outside_Rasak.tsx" />
+  <tileset firstgid="689" source="../../tilesets/urban/Tileset_Modern_BuildingExtras.tsx" />
+  <tileset firstgid="945" source="../../tilesets/urban/Tileset_Modern_CityShopping_Rasak.tsx" />
+  <tileset firstgid="1201" source="../../tilesets/urban/Tileset_Modern_Garbage_Rasak.tsx" />
+  <tileset firstgid="1457" source="../../tilesets/urban/Tileset_Modern_Park_Rasak.tsx" />
+  <tileset firstgid="1713" source="../../tilesets/urban/Tileset_Modern_PublicTransportation_Clean_Rasak.tsx" />
+  <tileset firstgid="1969" source="../../tilesets/urban/Tileset_Modern_Street_Rasak.tsx" />
+  <tileset firstgid="2225" source="../../tilesets/urban/A1_Modern_Outside_Rasak.tsx" />
+  <layer id="1" name="Ground" width="40" height="24">
+    <data encoding="csv">
 578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,
 578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,
 578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,
@@ -38,9 +38,9 @@
 578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,
 578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578,578
 </data>
- </layer>
- <layer id="2" name="Roads" width="40" height="24">
-  <data encoding="csv">
+  </layer>
+  <layer id="2" name="Roads" width="40" height="24">
+    <data encoding="csv">
 591,585,585,585,591,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,
 591,585,585,585,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,591,
 591,585,585,585,585,593,585,593,585,585,585,593,593,593,585,585,585,585,593,585,585,585,585,585,585,585,585,593,585,593,585,585,596,596,593,593,585,585,585,585,
@@ -66,9 +66,9 @@
 653,653,653,653,653,653,653,653,653,591,591,591,591,591,591,591,591,591,591,591,591,591,591,585,586,585,591,591,591,591,591,591,591,653,653,653,653,653,653,653,
 653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,653,591,585,586,585,591,653,653,653,653,653,653,653,653,653,653,653,653,653
 </data>
- </layer>
- <layer id="3" name="Water" width="40" height="24">
-  <data encoding="csv">
+  </layer>
+  <layer id="3" name="Water" width="40" height="24">
+    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -94,9 +94,9 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
- </layer>
- <layer id="4" name="Buildings" width="40" height="24">
-  <data encoding="csv">
+  </layer>
+  <layer id="4" name="Buildings" width="40" height="24">
+    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -122,9 +122,9 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
- </layer>
- <layer id="5" name="Decoration" width="40" height="24">
-  <data encoding="csv">
+  </layer>
+  <layer id="5" name="Decoration" width="40" height="24">
+    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2120,0,0,0,
@@ -150,120 +150,125 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,2231,0,0,0,0,0,0,0,2279,0,0,0,0,2219,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
- </layer>
- <objectgroup id="6" name="BuildingCollisions">
-  <object id="1" name="Blue-grey apartments" type="building" x="288" y="288" width="288" height="240"/>
-  <object id="2" name="Red brick apartments" type="building" x="672" y="288" width="288" height="240"/>
-  <object id="3" name="Warm brick rowhouses" type="building" x="1056" y="288" width="288" height="240"/>
-  <object id="4" name="Residential corner" type="building" x="720" y="576" width="194" height="288"/>
-  <object id="5" name="Community clinic" type="building" x="1008" y="576" width="336" height="288"/>
-  <object id="6" name="Commercial storefront" type="building" x="1632" y="336" width="288" height="240"/>
-  <object id="7" name="Townhouse row" type="building" x="1632" y="672" width="288" height="240"/>
- </objectgroup>
- <objectgroup id="7" name="PlayerSpawn">
-  <object id="10" name="player-start" type="PlayerSpawn" x="1128" y="1128">
-   <point/>
-  </object>
- </objectgroup>
- <objectgroup id="8" name="Civilians">
-  <object id="12" name="civilian_01" x="628" y="390">
-   <properties>
-    <property name="requiresBoat" type="bool" value="false"/>
-    <property name="rescued" type="bool" value="false"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="13" name="civilian_02" x="210" y="536">
-   <properties>
-    <property name="requiresBoat" type="bool" value="false"/>
-    <property name="rescued" type="bool" value="false"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="14" name="civilian_03" x="1376" y="454">
-   <properties>
-    <property name="requiresBoat" type="bool" value="false"/>
-    <property name="rescued" type="bool" value="false"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="15" name="civilian_04" x="1876" y="974">
-   <properties>
-    <property name="requiresBoat" type="bool" value="false"/>
-    <property name="rescued" type="bool" value="false"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="16" name="civilian_05" x="930" y="70">
-   <properties>
-    <property name="requiresBoat" type="bool" value="false"/>
-    <property name="rescued" type="bool" value="false"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="17" name="civilian_06" x="1574" y="582">
-   <properties>
-    <property name="requiresBoat" type="bool" value="false"/>
-    <property name="rescued" type="bool" value="false"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="18" name="civilian_07" x="962" y="712">
-   <properties>
-    <property name="requiresBoat" type="bool" value="false"/>
-    <property name="rescued" type="bool" value="false"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="19" name="civilian_08" x="642" y="878">
-   <properties>
-    <property name="requiresBoat" type="bool" value="false"/>
-    <property name="rescued" type="bool" value="false"/>
-   </properties>
-   <point/>
-  </object>
- </objectgroup>
- <objectgroup id="10" name="EvacuationZone">
-  <object id="23" name="evacuation_01" x="-2" y="768" width="434" height="378"/>
- </objectgroup>
- <objectgroup id="9" name="Drainage">
-  <properties>
-   <property name="cleaningTime" type="float" value="5"/>
-   <property name="clogged" type="bool" value="true"/>
-   <property name="floodReduction" type="float" value="0.2"/>
-  </properties>
-  <object id="20" name="drain_01" x="1848" y="166.667">
-   <properties>
-    <property name="cleaningTime" type="float" value="5"/>
-    <property name="clogged" type="bool" value="true"/>
-    <property name="floodReduction" type="float" value="0.2"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="21" name="drain_02" x="1418" y="982">
-   <properties>
-    <property name="cleaningTime" type="float" value="5"/>
-    <property name="clogged" type="bool" value="true"/>
-    <property name="floodReduction" type="float" value="0.2"/>
-   </properties>
-   <point/>
-  </object>
- </objectgroup>
- <objectgroup id="11" name="Garbage">
-  <object id="25" name="garbage_01" x="1754" y="124">
-   <point/>
-  </object>
-  <object id="26" name="garbage_02" x="1804" y="206">
-   <point/>
-  </object>
-  <object id="27" name="garbage_03" x="1366" y="980">
-   <point/>
-  </object>
-  <object id="28" name="garbage_04" x="1419.33" y="932">
-   <point/>
-  </object>
- </objectgroup>
- <objectgroup id="12" name="FloodZones">
-  <object id="29" name="flood_01" x="12.1212" y="57.5758" width="1909.09" height="484.848"/>
- </objectgroup>
+  </layer>
+  <objectgroup id="6" name="BuildingCollisions">
+    <object id="1" name="Blue-grey apartments" type="building" x="288" y="288" width="288" height="240" />
+    <object id="2" name="Red brick apartments" type="building" x="672" y="288" width="288" height="240" />
+    <object id="3" name="Warm brick rowhouses" type="building" x="1056" y="288" width="288" height="240" />
+    <object id="4" name="Residential corner" type="building" x="720" y="576" width="194" height="288" />
+    <object id="5" name="Community clinic" type="building" x="1008" y="576" width="336" height="288" />
+    <object id="6" name="Commercial storefront" type="building" x="1632" y="336" width="288" height="240" />
+    <object id="7" name="Townhouse row" type="building" x="1632" y="672" width="288" height="240" />
+  </objectgroup>
+  <objectgroup id="7" name="PlayerSpawn">
+    <object id="10" name="player-start" type="PlayerSpawn" x="1128" y="1128">
+      <point />
+    </object>
+  </objectgroup>
+  <objectgroup id="8" name="Civilians">
+    <object id="12" name="civilian_01" x="628" y="390">
+      <properties>
+        <property name="requiresBoat" type="bool" value="true" />
+        <property name="rescued" type="bool" value="false" />
+      </properties>
+      <point />
+    </object>
+    <object id="13" name="civilian_02" x="210" y="536">
+      <properties>
+        <property name="requiresBoat" type="bool" value="false" />
+        <property name="rescued" type="bool" value="false" />
+      </properties>
+      <point />
+    </object>
+    <object id="14" name="civilian_03" x="1376" y="454">
+      <properties>
+        <property name="requiresBoat" type="bool" value="false" />
+        <property name="rescued" type="bool" value="false" />
+      </properties>
+      <point />
+    </object>
+    <object id="15" name="civilian_04" x="1876" y="974">
+      <properties>
+        <property name="requiresBoat" type="bool" value="false" />
+        <property name="rescued" type="bool" value="false" />
+      </properties>
+      <point />
+    </object>
+    <object id="16" name="civilian_05" x="930" y="70">
+      <properties>
+        <property name="requiresBoat" type="bool" value="true" />
+        <property name="rescued" type="bool" value="false" />
+      </properties>
+      <point />
+    </object>
+    <object id="17" name="civilian_06" x="1574" y="582">
+      <properties>
+        <property name="requiresBoat" type="bool" value="false" />
+        <property name="rescued" type="bool" value="false" />
+      </properties>
+      <point />
+    </object>
+    <object id="18" name="civilian_07" x="962" y="712">
+      <properties>
+        <property name="requiresBoat" type="bool" value="false" />
+        <property name="rescued" type="bool" value="false" />
+      </properties>
+      <point />
+    </object>
+    <object id="19" name="civilian_08" x="642" y="878">
+      <properties>
+        <property name="requiresBoat" type="bool" value="false" />
+        <property name="rescued" type="bool" value="false" />
+      </properties>
+      <point />
+    </object>
+  </objectgroup>
+  <objectgroup id="10" name="EvacuationZone">
+    <object id="23" name="evacuation_01" x="-2" y="768" width="434" height="378" />
+  </objectgroup>
+  <objectgroup id="9" name="Drainage">
+    <properties>
+      <property name="cleaningTime" type="float" value="5" />
+      <property name="clogged" type="bool" value="true" />
+      <property name="floodReduction" type="float" value="0.2" />
+    </properties>
+    <object id="20" name="drain_01" x="1848" y="166.667">
+      <properties>
+        <property name="cleaningTime" type="float" value="5" />
+        <property name="clogged" type="bool" value="true" />
+        <property name="floodReduction" type="float" value="0.2" />
+      </properties>
+      <point />
+    </object>
+    <object id="21" name="drain_02" x="1418" y="982">
+      <properties>
+        <property name="cleaningTime" type="float" value="5" />
+        <property name="clogged" type="bool" value="true" />
+        <property name="floodReduction" type="float" value="0.2" />
+      </properties>
+      <point />
+    </object>
+  </objectgroup>
+  <objectgroup id="11" name="Garbage">
+    <object id="25" name="garbage_01" x="1754" y="124">
+      <point />
+    </object>
+    <object id="26" name="garbage_02" x="1804" y="206">
+      <point />
+    </object>
+    <object id="27" name="garbage_03" x="1366" y="980">
+      <point />
+    </object>
+    <object id="28" name="garbage_04" x="1419.33" y="932">
+      <point />
+    </object>
+  </objectgroup>
+  <objectgroup id="12" name="FloodZones">
+    <object id="29" name="flood_01" x="12.1212" y="57.5758" width="1909.09" height="484.848" />
+  </objectgroup>
+  <objectgroup id="14" name="BoatSpawn">
+    <object id="32" name="boat_start" x="1500" y="487">
+      <point />
+    </object>
+  </objectgroup>
 </map>

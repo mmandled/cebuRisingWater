@@ -2,9 +2,9 @@ package com.risingwaters.model;
 
 import com.badlogic.gdx.math.Vector2;
 
-/** A civilian's mission state is owned by this model, not the rendering screen. */
+// Stores each civilian's rescue status.
 public final class Civilian {
-    public enum State { WAITING, ESCORTED, EVACUATED }
+    public enum State { WAITING, ESCORTED, BOARDED, EVACUATED }
 
     private final String id;
     private final Vector2 position;
@@ -29,6 +29,17 @@ public final class Civilian {
         if (state != State.WAITING || requiresBoat) {
             throw new IllegalStateException("Civilian cannot be escorted on foot: " + id);
         }
+        state = State.ESCORTED;
+    }
+
+    // A civilian can ride in the boat until it reaches shore.
+    public void beginBoatRide() {
+        if (state != State.WAITING) throw new IllegalStateException("Already being rescued: " + id);
+        state = State.BOARDED;
+    }
+
+    public void leaveBoat() {
+        if (state != State.BOARDED) throw new IllegalStateException("Not on a boat: " + id);
         state = State.ESCORTED;
     }
 
