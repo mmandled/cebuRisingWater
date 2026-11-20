@@ -11,6 +11,11 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.maps.objects.*;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.risingwaters.model.Civilian;
+import com.risingwaters.controller.RescueController;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -22,11 +27,6 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.risingwaters.CebuRisingWatersGame;
 
-/**
- * Initial playable Talamban map: rendering, camera, WASD, and solid building collisions.
- * This deliberately uses a placeholder marker until character artwork is ready.
- * Tiled object coordinates are converted from top-left origin to LibGDX bottom-left origin.
- */
 public class TalambanGameScreen extends ScreenAdapter {
     private static final String MAP_PATH = "maps/mission1/mission1_talamban.tmx";
     private static final float VIEW_WIDTH = 960f;
@@ -48,6 +48,10 @@ public class TalambanGameScreen extends ScreenAdapter {
     private final Array<Rectangle> walls = new Array<>();
     private final Vector2 input = new Vector2();
     private boolean collisionDebug = false;
+    private RescueController rescue;
+    private OrthographicCamera hudCamera;
+    private ScreenViewport hudViewport;
+    private static final float CIVILIAN_RADIUS = 14f;
 
     public TalambanGameScreen(CebuRisingWatersGame game) {
         this.game = game;
@@ -65,6 +69,9 @@ public class TalambanGameScreen extends ScreenAdapter {
 
         loadBuildingCollisions();
         loadPlayerSpawn();
+        loadRescueObjects();
+        hudCamera = new OrthographicCamera();
+        hudViewport = new ScreenViewport(hudCamera);
 
         viewport.update(
             Gdx.graphics.getWidth(),
@@ -73,7 +80,7 @@ public class TalambanGameScreen extends ScreenAdapter {
         );
 
         centerCameraOnMap();
-
+        hudViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
     }
 
     private void loadBuildingCollisions() {
@@ -91,8 +98,6 @@ public class TalambanGameScreen extends ScreenAdapter {
     }
 
     private void loadPlayerSpawn() {
-        // Tiled point coordinates are top-down; libGDX's map loader converts them
-        // into y-up coordinates, with y=0 at the bottom of the map.
         MapLayer layer = map.getLayers().get("PlayerSpawn");
         if (layer == null || layer.getObjects().getCount() == 0) {
             throw new IllegalStateException("PlayerSpawn layer is missing or empty");
@@ -106,6 +111,34 @@ public class TalambanGameScreen extends ScreenAdapter {
         player.y = MathUtils.clamp(player.y, 0, mapHeight - player.height);
     }
 
+    private void loadRescueObjects() {
+        MapLayer civilianLayer = map.getLayers().get("Civilians");
+        MapLayer zoneLayer = map.getLayers().get("EvacuationZone");
+        if (civilianLayer == null || zoneLayer == null) {
+            throw new IllegalStateException("Civilians / EvacuationZone object layer missing");
+        }
+        Array<Civilian> civilianModels = new Array<>();
+        for (MapObject object : civilianLayer.getObjects()) {
+            Object px = object.getProperties().get("x");
+            Object py = object.getProperties().get("y");
+            if (!(px instanceof Number) || !(py instanceof Number)) continue;
+            boolean requiresBoat = Boolean.TRUE.equals(object.getProperties().get("requiresBoat"));
+            boolean rescued = Boolean.TRUE.equals(object.getProperties().get("rescued"));
+            civilianModels.add(new Civilian(object.getName(),
+                ((Number) px).floatValue(), ((Number) py).floatValue(), requiresBoat, rescued));
+        }
+        Rectangle evacuation = null;
+        for (MapObject object : zoneLayer.getObjects()) {
+            if (object instanceof RectangleMapObject) {
+                evacuation = ((RectangleMapObject) object).getRectangle();
+                break;
+            }
+        }
+        if (evacuation == null) throw new IllegalStateException("No rectangle in EvacuationZone");
+        rescue = new RescueController(civilianModels, evacuation);
+        Gdx.app.log("Talamban", "Loaded " + civilianModels.size + " civilians and evacuation zone");
+    }
+
     @Override
     public void render(float delta) {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
@@ -115,6 +148,10 @@ public class TalambanGameScreen extends ScreenAdapter {
         if (Gdx.input.isKeyJustPressed(Input.Keys.F3)) collisionDebug = !collisionDebug;
 
         updatePlayer(Math.min(delta, 1f / 30f));
+        float cx = player.x + player.width / 2f;
+        float cy = player.y + player.height / 2f;
+        rescue.update(cx, cy);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) rescue.interact(cx, cy);
         viewport.apply();
         ScreenUtils.clear(0.10f, 0.12f, 0.14f, 1f);
         mapRenderer.setView(camera);
@@ -128,6 +165,18 @@ public class TalambanGameScreen extends ScreenAdapter {
         shapes.rect(player.x + 5, player.y + 5, player.width - 10, player.height - 10);
         shapes.end();
 
+        shapes.begin(ShapeRenderer.ShapeType.Filled);
+        for (Civilian civilian : rescue.getCivilians()) {
+            if (civilian.isEvacuated()) continue;
+            if (civilian.getState() == Civilian.State.ESCORTED) shapes.setColor(Color.CYAN);
+            else if (civilian.requiresBoat()) shapes.setColor(Color.ORANGE);
+            else shapes.setColor(Color.WHITE);
+            shapes.circle(civilian.getPosition().x, civilian.getPosition().y, CIVILIAN_RADIUS);
+            shapes.setColor(Color.DARK_GRAY);
+            shapes.circle(civilian.getPosition().x, civilian.getPosition().y, CIVILIAN_RADIUS / 2f);
+        }
+        shapes.end();
+
         if (collisionDebug) {
             shapes.begin(ShapeRenderer.ShapeType.Line);
             shapes.setColor(Color.RED);
@@ -136,15 +185,19 @@ public class TalambanGameScreen extends ScreenAdapter {
             shapes.rect(player.x, player.y, player.width, player.height);
             shapes.end();
         }
-        batch.setProjectionMatrix(viewport.getCamera().combined);
+
+        hudViewport.apply();
+        batch.setProjectionMatrix(hudCamera.combined);
         batch.begin();
         font.setColor(Color.WHITE);
-        font.draw(
-            batch,
-            "MISSION 1 - TALAMBAN | WASD: Move | F3: Collisions | ESC: Menu",
-            20f,
-            mapHeight - 20f
-        );
+        float top = Gdx.graphics.getHeight() - 18f;
+        font.draw(batch, "MISSION 1: TALAMBAN | WASD Move | E Escort | F3 Collisions | ESC Menu", 14f, top);
+        font.draw(batch, "Evacuated: " + rescue.getEvacuatedCount() + "/" + rescue.getCivilianCount()
+            + "  |  " + (rescue.isComplete() ? "All civilians safe!" : rescue.getMessage()), 14f, top - 22f);
+        if (rescue.getEscorted() == null) {
+            Civilian near = rescue.nearestAvailable(player.x + player.width/2f, player.y + player.height/2f);
+            if (near != null) font.draw(batch, "E: Escort " + near.getId(), 14f, top - 44f);
+        }
         batch.end();
     }
 
@@ -186,6 +239,7 @@ public class TalambanGameScreen extends ScreenAdapter {
     public void resize(int width, int height) {
         viewport.update(width, height, true);
         centerCameraOnMap();
+        hudViewport.update(width, height, true);
     }
 
     @Override public void dispose() { font.dispose(); batch.dispose(); shapes.dispose(); mapRenderer.dispose(); map.dispose(); }
