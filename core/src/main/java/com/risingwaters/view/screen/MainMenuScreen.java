@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.risingwaters.CebuRisingWatersGame;
 
 public class MainMenuScreen extends ScreenAdapter {
 
@@ -27,6 +28,7 @@ public class MainMenuScreen extends ScreenAdapter {
     private static final float BUTTON_WIDTH = 290;
     private static final float BUTTON_HEIGHT = 52;
 
+    private final CebuRisingWatersGame game;
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
 
@@ -51,7 +53,8 @@ public class MainMenuScreen extends ScreenAdapter {
 
     private int hoveredButton = -1;
 
-    public MainMenuScreen() {
+    public MainMenuScreen(CebuRisingWatersGame game) {
+        this.game = game;
 
         camera = new OrthographicCamera();
 
@@ -332,7 +335,7 @@ public class MainMenuScreen extends ScreenAdapter {
         switch (index) {
 
             case 0:
-                Gdx.app.log("MainMenu", "Start Game selected.");
+                game.setScreen(new TalambanGameScreen(game));
                 break;
 
             case 1:

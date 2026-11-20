@@ -1,0 +1,346 @@
+<?xml version='1.0' encoding='utf-8'?>
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="40" height="24" tilewidth="48" tileheight="48" infinite="0" nextlayerid="13" nextobjectid="23">
+  <properties>
+    <property name="missionName" value="Mission 1 - The First Warning" />
+    <property name="location" value="Talamban" />
+    <property name="mapRole" value="Level design implementation guide; tune positions with the team before gameplay integration." />
+    <property name="rescueTarget" value="5" />
+    <property name="blockedDrainageTarget" value="3" />
+    <property name="floodBarrierTarget" value="2" />
+    <property name="designReference" value="Trent Level 1 - Basics schematic supplied by the team." />
+    <property name="strongCurrentNote" value="Upper right channel is a strong current sourced by garbage; this is not a Level 3 flash-flood event." />
+    <property name="tileSize" value="48x48" />
+    <property name="draftMapSize" value="40x24" />
+  </properties>
+  <tileset firstgid="1" version="1.10" tiledversion="1.10.2" name="A1_Modern_Outside_Rasak" tilewidth="48" tileheight="48" tilecount="192" columns="16">
+    <image source="../../tilesets/urban/A1_Modern_Outside_Rasak.png" width="768" height="576" />
+  </tileset>
+  <tileset firstgid="193" version="1.10" tiledversion="1.10.2" name="A2_Modern_City_Rasak" tilewidth="48" tileheight="48" tilecount="192" columns="16">
+    <image source="../../tilesets/urban/A2_Modern_City_Rasak.png" width="768" height="576" />
+  </tileset>
+  <tileset firstgid="385" version="1.10" tiledversion="1.10.2" name="A3_Modern_Outside_Rasak" tilewidth="48" tileheight="48" tilecount="128" columns="16">
+    <image source="../../tilesets/urban/A3_Modern_Outside_Rasak.png" width="768" height="384" />
+  </tileset>
+  <tileset firstgid="513" version="1.10" tiledversion="1.10.2" name="A4_Modern_Outside_Rasak" tilewidth="48" tileheight="48" tilecount="240" columns="16">
+    <image source="../../tilesets/urban/A4_Modern_Outside_Rasak.png" width="768" height="720" />
+  </tileset>
+  <tileset firstgid="753" version="1.10" tiledversion="1.10.2" name="Tileset_Modern_Garbage_Rasak" tilewidth="48" tileheight="48" tilecount="256" columns="16">
+    <image source="../../tilesets/urban/Tileset_Modern_Garbage_Rasak.png" width="768" height="768" />
+  </tileset>
+  <layer id="1" name="Ground" width="40" height="24" visible="1" opacity="1">
+    <data encoding="csv">
+241,241,263,263,263,263,263,263,263,263,263,263,263,263,241,241,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,241,241,263,263,263,263,263,241,241,
+241,241,263,263,263,263,263,263,263,263,263,263,263,263,241,241,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,241,241,263,263,263,263,263,241,241,
+241,241,263,263,263,263,263,263,263,263,263,263,263,263,241,241,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,241,241,263,263,263,263,263,241,241,
+241,241,263,263,263,263,263,263,263,263,263,263,263,263,241,241,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,241,241,263,263,263,263,263,241,241,
+263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,
+263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,
+263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,
+263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,
+263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,
+263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,
+263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,
+263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,
+241,241,263,263,263,263,263,263,263,263,241,241,241,263,263,263,263,263,263,263,263,263,263,263,263,263,263,241,241,263,263,263,263,263,263,263,263,241,241,241,
+241,241,263,263,263,263,263,263,263,263,241,241,241,263,263,263,263,263,263,263,263,263,263,263,263,263,263,241,241,263,263,263,263,263,263,263,263,241,241,241,
+241,241,263,263,263,263,263,263,263,263,241,241,241,263,263,263,263,263,263,263,263,263,263,263,263,263,263,241,241,263,263,263,263,263,263,263,263,241,241,241,
+241,241,263,263,263,263,263,263,263,263,241,241,241,263,263,263,263,263,263,263,263,263,263,263,263,263,263,241,241,263,263,263,263,263,263,263,263,241,241,241,
+263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,
+263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,
+263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,
+263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,
+241,241,263,263,263,263,263,241,241,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,241,241,263,263,263,263,263,241,241,
+241,241,263,263,263,263,263,241,241,263,263,263,263,263,263,263,263,241,241,241,241,241,241,263,263,263,263,263,263,263,263,241,241,263,263,263,263,263,241,241,
+241,241,263,263,263,263,263,241,241,263,263,263,263,263,263,263,263,241,241,241,241,241,241,263,263,263,263,263,263,263,263,241,241,263,263,263,263,263,241,241,
+241,241,263,263,263,263,263,241,241,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,263,241,241,263,263,263,263,263,241,241
+</data>
+  </layer>
+  <layer id="2" name="Roads" width="40" height="24" visible="1" opacity="1">
+    <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,
+369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,369,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+369,369,369,369,369,369,369,369,369,369,369,369,369,369,0,0,0,0,0,0,0,0,0,0,0,0,369,369,369,369,369,369,369,369,369,369,369,369,369,369,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+  </layer>
+  <layer id="3" name="Water" width="40" height="24" visible="1" opacity="1">
+    <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+  </layer>
+  <layer id="4" name="Buildings" width="40" height="24" visible="1" opacity="1">
+    <data encoding="csv">
+0,451,451,451,451,451,451,451,453,453,453,453,453,453,453,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,451,451,451,451,451,451,451,453,453,453,453,453,453,453,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,451,451,451,451,451,451,451,453,453,453,453,453,453,453,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,725,725,725,725,725,725,725,729,729,729,729,729,729,729,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,725,725,725,725,725,725,725,729,729,729,729,729,729,729,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,451,451,451,451,451,453,453,453,453,453,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,453,453,453,453,451,451,451,451,451,0,0,
+0,451,451,451,451,451,453,453,453,453,453,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,453,453,453,453,451,451,451,451,451,0,0,
+0,725,725,725,725,725,729,729,729,729,729,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,729,729,729,729,725,725,725,725,725,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+453,453,453,453,453,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,451,451,451,451,451,
+453,453,453,453,453,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,451,451,451,451,451,
+729,729,729,729,729,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,725,725,725,725,725
+</data>
+  </layer>
+  <layer id="5" name="Decoration" width="40" height="24" visible="1" opacity="1">
+    <data encoding="csv">
+299,0,0,0,0,0,0,0,0,0,0,0,0,0,0,299,0,0,0,0,0,0,0,0,0,0,0,0,0,0,299,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,315,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,315,0,0,0,0,0,0,0,0,
+315,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+299,0,0,0,0,0,0,0,0,0,0,0,299,0,0,0,0,0,0,0,0,0,0,0,0,0,0,299,0,0,0,0,0,0,0,0,0,0,0,299,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,315,0,0,0,0,0,0,0,0,0,0,0,0,0,0,315,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+315,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,315,
+299,0,0,0,0,0,0,0,299,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,299,0,0,0,0,0,0,0,299,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,315,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,315,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+  </layer>
+  <objectgroup id="6" name="Obstacles" draworder="topdown" visible="1">
+    <object id="1" name="Upper-left solid obstacle" type="Obstacle" x="0" y="0" width="768" height="240">
+      <properties>
+        <property name="obstacleType" value="building" type="string" />
+        <property name="blocksBoat" value="true" type="bool" />
+        <property name="collisionDamage" value="1" type="int" />
+      </properties>
+    </object>
+    <object id="2" name="Small debris obstacle" type="Obstacle" x="192" y="480" width="144" height="48">
+      <properties>
+        <property name="obstacleType" value="debris" type="string" />
+        <property name="blocksBoat" value="true" type="bool" />
+        <property name="collisionDamage" value="1" type="int" />
+      </properties>
+    </object>
+    <object id="3" name="Central obstacle" type="Obstacle" x="768" y="432" width="144" height="144">
+      <properties>
+        <property name="obstacleType" value="structure" type="string" />
+        <property name="blocksBoat" value="true" type="bool" />
+        <property name="collisionDamage" value="1" type="int" />
+      </properties>
+    </object>
+    <object id="4" name="Long west obstacle" type="Obstacle" x="0" y="672" width="720" height="96">
+      <properties>
+        <property name="obstacleType" value="structure" type="string" />
+        <property name="blocksBoat" value="true" type="bool" />
+        <property name="collisionDamage" value="1" type="int" />
+      </properties>
+    </object>
+    <object id="5" name="Long east obstacle" type="Obstacle" x="1296" y="672" width="624" height="96">
+      <properties>
+        <property name="obstacleType" value="structure" type="string" />
+        <property name="blocksBoat" value="true" type="bool" />
+        <property name="collisionDamage" value="1" type="int" />
+      </properties>
+    </object>
+    <object id="6" name="Lower west obstacle" type="Obstacle" x="0" y="864" width="624" height="96">
+      <properties>
+        <property name="obstacleType" value="structure" type="string" />
+        <property name="blocksBoat" value="true" type="bool" />
+        <property name="collisionDamage" value="1" type="int" />
+      </properties>
+    </object>
+    <object id="7" name="Lower east obstacle" type="Obstacle" x="1344" y="864" width="576" height="96">
+      <properties>
+        <property name="obstacleType" value="structure" type="string" />
+        <property name="blocksBoat" value="true" type="bool" />
+        <property name="collisionDamage" value="1" type="int" />
+      </properties>
+    </object>
+  </objectgroup>
+  <objectgroup id="7" name="WaterCurrents" draworder="topdown" visible="1">
+    <object id="8" name="Upper strong current" type="WaterCurrent" x="768" y="0" width="1152" height="240">
+      <properties>
+        <property name="directionX" value="1" type="int" />
+        <property name="directionY" value="0" type="int" />
+        <property name="strength" value="strong" type="string" />
+        <property name="currentType" value="garbage_source" type="string" />
+        <property name="affectsBoatSpeed" value="true" type="bool" />
+      </properties>
+    </object>
+    <object id="9" name="Main flooded area current" type="WaterCurrent" x="0" y="384" width="1920" height="384">
+      <properties>
+        <property name="directionX" value="-1" type="int" />
+        <property name="directionY" value="0" type="int" />
+        <property name="strength" value="normal" type="string" />
+        <property name="currentType" value="main_channel" type="string" />
+        <property name="affectsBoatSpeed" value="true" type="bool" />
+      </properties>
+    </object>
+    <object id="10" name="Lower flooded area current" type="WaterCurrent" x="0" y="816" width="1920" height="192">
+      <properties>
+        <property name="directionX" value="-1" type="int" />
+        <property name="directionY" value="0" type="int" />
+        <property name="strength" value="normal" type="string" />
+        <property name="currentType" value="lower_channel" type="string" />
+        <property name="affectsBoatSpeed" value="true" type="bool" />
+      </properties>
+    </object>
+  </objectgroup>
+  <objectgroup id="8" name="GarbagePiles" draworder="topdown" visible="1">
+    <object id="11" name="Blocked Drainage 1" type="GarbagePile" x="1780" y="196" width="40" height="40">
+      <ellipse />
+      <properties>
+        <property name="targetId" value="1" type="int" />
+        <property name="cleared" value="false" type="bool" />
+        <property name="affectsCurrent" value="true" type="bool" />
+        <property name="clearable" value="true" type="bool" />
+      </properties>
+    </object>
+    <object id="12" name="Blocked Drainage 2" type="GarbagePile" x="628" y="484" width="40" height="40">
+      <ellipse />
+      <properties>
+        <property name="targetId" value="2" type="int" />
+        <property name="cleared" value="false" type="bool" />
+        <property name="affectsCurrent" value="true" type="bool" />
+        <property name="clearable" value="true" type="bool" />
+      </properties>
+    </object>
+    <object id="13" name="Blocked Drainage 3" type="GarbagePile" x="1156" y="868" width="40" height="40">
+      <ellipse />
+      <properties>
+        <property name="targetId" value="3" type="int" />
+        <property name="cleared" value="false" type="bool" />
+        <property name="affectsCurrent" value="true" type="bool" />
+        <property name="clearable" value="true" type="bool" />
+      </properties>
+    </object>
+  </objectgroup>
+  <objectgroup id="9" name="CivilianSpawns" draworder="topdown" visible="1">
+    <object id="14" name="Civilian Spawn 1" type="CivilianSpawn" x="168" y="456">
+      <point />
+      <properties>
+        <property name="civilianId" value="1" type="int" />
+        <property name="rescued" value="false" type="bool" />
+      </properties>
+    </object>
+    <object id="15" name="Civilian Spawn 2" type="CivilianSpawn" x="552" y="456">
+      <point />
+      <properties>
+        <property name="civilianId" value="2" type="int" />
+        <property name="rescued" value="false" type="bool" />
+      </properties>
+    </object>
+    <object id="16" name="Civilian Spawn 3" type="CivilianSpawn" x="1080" y="552">
+      <point />
+      <properties>
+        <property name="civilianId" value="3" type="int" />
+        <property name="rescued" value="false" type="bool" />
+      </properties>
+    </object>
+    <object id="17" name="Civilian Spawn 4" type="CivilianSpawn" x="1656" y="456">
+      <point />
+      <properties>
+        <property name="civilianId" value="4" type="int" />
+        <property name="rescued" value="false" type="bool" />
+      </properties>
+    </object>
+    <object id="18" name="Civilian Spawn 5" type="CivilianSpawn" x="1176" y="936">
+      <point />
+      <properties>
+        <property name="civilianId" value="5" type="int" />
+        <property name="rescued" value="false" type="bool" />
+      </properties>
+    </object>
+  </objectgroup>
+  <objectgroup id="10" name="BarrierPoints" draworder="topdown" visible="1">
+    <object id="19" name="Flood Barrier Point 1" type="BarrierPoint" x="696" y="648">
+      <point />
+      <properties>
+        <property name="pointId" value="1" type="int" />
+        <property name="occupied" value="false" type="bool" />
+      </properties>
+    </object>
+    <object id="20" name="Flood Barrier Point 2" type="BarrierPoint" x="1224" y="648">
+      <point />
+      <properties>
+        <property name="pointId" value="2" type="int" />
+        <property name="occupied" value="false" type="bool" />
+      </properties>
+    </object>
+  </objectgroup>
+  <objectgroup id="11" name="BoatSpawn" draworder="topdown" visible="1">
+    <object id="21" name="Rescue Boat Spawn" type="BoatSpawn" x="984" y="1080">
+      <point />
+    </object>
+  </objectgroup>
+  <objectgroup id="12" name="SafeZone" draworder="topdown" visible="1">
+    <object id="22" name="Safe Zone" type="SafeZone" x="672" y="1008" width="576" height="144">
+      <properties>
+        <property name="zoneType" value="safe" type="string" />
+        <property name="unloadPassengers" value="true" type="bool" />
+        <property name="mapArea" value="non_flooded" type="string" />
+      </properties>
+    </object>
+  </objectgroup>
+</map>

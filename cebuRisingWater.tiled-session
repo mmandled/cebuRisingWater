@@ -1,0 +1,262 @@
+{
+    "activeFile": "assets/maps/mission1/mission1_talamban.tmx",
+    "expandedProjectPaths": [
+        "assets/tilesets/urban",
+        ".idea",
+        "assets",
+        "assets/tilesets",
+        "assets/maps/mission1",
+        "assets/maps/mission2",
+        ".",
+        "assets/maps"
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "C:/Users/Emmanuel/Downloads/Cebu_Rising_Waters_FINAL_Layered_TMX_Maps/Cebu_Rising_Waters_Layered_Maps/cebu_city_tiles.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/Cebu_Rising_Waters_FINAL_Layered_TMX_Maps/Cebu_Rising_Waters_Layered_Maps/mission1_talamban.tmx": {
+            "scale": 0.22434303977272727,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 1406.3284527107242,
+                "y": 1025.215670755837
+            }
+        },
+        "C:/Users/Emmanuel/Downloads/Rasaks_Tiled_Starter_FIXED/Rasaks_Tiled_Starter_FIXED/Talamban_Starter.tmx": {
+            "scale": 0.2632291666666667,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 1228.9671547289277,
+                "y": 961.139691333597
+            }
+        },
+        "C:/Users/Emmanuel/Downloads/Rasaks_Tiled_Starter_FIXED/Rasaks_Tiled_Starter_FIXED/tilesets/A2_Modern_City_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/Rasaks_Tiled_Starter_FIXED/Rasaks_Tiled_Starter_FIXED/tilesets/A3_Modern_Outside_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/Rasaks_Tiled_Starter_FIXED/Rasaks_Tiled_Starter_FIXED/tilesets/A4_Modern_Outside_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/Rasaks_Tiled_Starter_FIXED/Rasaks_Tiled_Starter_FIXED/tilesets/A5_Street_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/Rasaks_Tiled_Starter_FIXED/Rasaks_Tiled_Starter_FIXED/tilesets/Tileset_Modern_CityShopping_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/Rasaks_Tiled_Starter_FIXED/Rasaks_Tiled_Starter_FIXED/tilesets/Tileset_Modern_Garbage_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/Rasaks_Tiled_Starter_FIXED/Rasaks_Tiled_Starter_FIXED/tilesets/Tileset_Modern_Park_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/Rasaks_Tiled_Starter_FIXED/Rasaks_Tiled_Starter_FIXED/tilesets/Tileset_Modern_Street_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/Talamban_Existing_Map_With_Buildings/maps/mission1/mission1_talamban.tmx": {
+            "scale": 0.48736979166666666,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 959.230563718942,
+                "y": 576.564253272776
+            }
+        },
+        "C:/Users/Emmanuel/Downloads/Talamban_Existing_Map_With_Buildings/tilesets/urban/A1_Modern_Outside_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/Talamban_Existing_Map_With_Buildings/tilesets/urban/A2_Modern_City_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/Talamban_Existing_Map_With_Buildings/tilesets/urban/A3_Modern_Outside_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/Talamban_Existing_Map_With_Buildings/tilesets/urban/A4_Modern_Outside_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/Talamban_Existing_Map_With_Buildings/tilesets/urban/A5_Modern_Outside_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/Talamban_Existing_Map_With_Buildings/tilesets/urban/Tileset_Modern_BuildingExtras.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/Talamban_Existing_Map_With_Buildings/tilesets/urban/Tileset_Modern_CityShopping_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/Talamban_Existing_Map_With_Buildings/tilesets/urban/Tileset_Modern_Garbage_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/Talamban_Existing_Map_With_Buildings/tilesets/urban/Tileset_Modern_Park_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/Talamban_Existing_Map_With_Buildings/tilesets/urban/Tileset_Modern_PublicTransportation_Clean_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/Talamban_Existing_Map_With_Buildings/tilesets/urban/Tileset_Modern_Street_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/Emmanuel/Downloads/cebu_rising_waters_ready_map/cebu_rising_waters_ready_map/mission1_talamban.tmx": {
+            "scale": 0.4387152777777778,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 719.1452314998022,
+                "y": 544.7724574594381
+            }
+        },
+        "C:/Users/Emmanuel/Downloads/cebu_rising_waters_ready_map/cebu_rising_waters_ready_map/tutorial.tmx": {
+            "scale": 0.4387152777777778,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 719.1452314998022,
+                "y": 544.7724574594381
+            }
+        },
+        "assets/maps/level1_talamban.tmx": {
+            "scale": 0.3299641927083333,
+            "selectedLayer": 4,
+            "viewCenter": {
+                "x": 1563.8060474522765,
+                "y": 169.71538499482074
+            }
+        },
+        "assets/maps/mission1/mission1_talamban.tmx": {
+            "expandedObjectLayers": [
+                12,
+                6,
+                9,
+                7,
+                8,
+                10,
+                11
+            ],
+            "scale": 0.33,
+            "selectedLayer": 10,
+            "viewCenter": {
+                "x": 910.6060606060605,
+                "y": 475.75757575757575
+            }
+        },
+        "assets/maps/mission2/test.tmx": {
+            "scale": 0.5279427083333333,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": -517.1015636560943,
+                "y": 576.7671286933361
+            }
+        },
+        "assets/maps/mission2/test.tmx#A1_Modern_Outside_Rasak": {
+            "scaleInDock": 1
+        },
+        "assets/maps/mission2/test.tmx#A2_Modern_City_Rasak": {
+            "scaleInDock": 1
+        },
+        "assets/maps/mission2/test.tmx#A3_Modern_Outside_Rasak": {
+            "scaleInDock": 1
+        },
+        "assets/maps/mission2/test.tmx#A4_Modern_Outside_Rasak": {
+            "scaleInDock": 1
+        },
+        "assets/maps/mission2/test.tmx#Tileset_Modern_Garbage_Rasak": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/A1_Modern_Outside_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/A2_Modern_City_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/A3_Modern_Outside_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/A4_Modern_Outside_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/A5_Modern_Outside_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/Tileset_Modern_BuildingExtras.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/Tileset_Modern_CityShopping_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/Tileset_Modern_Garbage_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/Tileset_Modern_Park_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/Tileset_Modern_PublicTransportation_Clean_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/Tileset_Modern_Street_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/urban/A1_Modern_Outside_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/urban/A2_Modern_City_Rasak.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "assets/tilesets/urban/A3_Modern_Outside_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/urban/A4_Modern_Outside_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/urban/A5_Modern_Outside_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/urban/Tileset_Modern_BuildingExtras.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/urban/Tileset_Modern_CityShopping_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/urban/Tileset_Modern_Garbage_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/urban/Tileset_Modern_Park_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/urban/Tileset_Modern_PublicTransportation_Clean_Rasak.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/urban/Tileset_Modern_Street_Rasak.tsx": {
+            "scaleInDock": 1
+        }
+    },
+    "last.externalTilesetPath": "C:/GameProjects/cebu-rising-water-libgdx/assets/tilesets/urban",
+    "last.imagePath": "C:/GameProjects/cebu-rising-water-libgdx/assets/tilesets/urban",
+    "map.height": 24,
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 48,
+    "map.tileWidth": 48,
+    "map.width": 40,
+    "openFiles": [
+        "assets/maps/mission1/mission1_talamban.tmx"
+    ],
+    "project": "cebuRisingWater.tiled-project",
+    "property.type": "bool",
+    "recentFiles": [
+        "assets/maps/mission1/mission1_talamban.tmx",
+        "C:/Users/Emmanuel/Downloads/Talamban_Existing_Map_With_Buildings/maps/mission1/mission1_talamban.tmx",
+        "C:/Users/Emmanuel/Downloads/Rasaks_Tiled_Starter_FIXED/Rasaks_Tiled_Starter_FIXED/Talamban_Starter.tmx",
+        "assets/tilesets/urban/A2_Modern_City_Rasak.tsx",
+        "C:/Users/Emmanuel/Downloads/Cebu_Rising_Waters_FINAL_Layered_TMX_Maps/Cebu_Rising_Waters_Layered_Maps/mission1_talamban.tmx",
+        "C:/Users/Emmanuel/Downloads/cebu_rising_waters_ready_map/cebu_rising_waters_ready_map/tutorial.tmx",
+        "C:/Users/Emmanuel/Downloads/cebu_rising_waters_ready_map/cebu_rising_waters_ready_map/mission1_talamban.tmx",
+        "assets/maps/level1_talamban.tmx",
+        "assets/maps/mission2/test.tmx"
+    ],
+    "tileset.embedInMap": false,
+    "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)",
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 48,
+        "width": 48
+    },
+    "tileset.type": 0
+}
