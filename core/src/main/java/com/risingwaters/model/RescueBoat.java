@@ -66,6 +66,10 @@ public class RescueBoat {
         return civilian;
     }
 
+    public void repair(float amount) {
+        health = Math.min(maxHealth, health + Math.max(0f, amount));
+    }
+
     public void takeDamage(float amount) {
         health = Math.max(0f, health - Math.max(0f, amount));
     }

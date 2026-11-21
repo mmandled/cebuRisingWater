@@ -18,6 +18,7 @@ import com.risingwaters.model.Civilian;
 import com.risingwaters.model.RescueBoat;
 import com.risingwaters.model.Drainage;
 import com.risingwaters.model.GarbagePile;
+import com.risingwaters.model.FloodBarrier;
 import com.risingwaters.system.FloodSystem;
 import com.badlogic.gdx.graphics.GL20;
 import com.risingwaters.controller.RescueController;
@@ -59,13 +60,22 @@ public class TalambanGameScreen extends ScreenAdapter {
     private OrthographicCamera hudCamera;
     private ScreenViewport hudViewport;
     private static final float CIVILIAN_RADIUS = 14f;
-    private static final float BOAT_RANGE = 112f;
+    private static final float DOCK_RANGE = 112f;
+    private static final float PLAYER_WATER_DAMAGE_INTERVAL = 2.0f;
     private RescueBoat boat;
     private FloodSystem flood;
     private final Vector2 current = new Vector2();
     private float collisionCooldown;
+    private int playerHealth = 3;
+    private float deepWaterTime;
+    private int repairKits = 2;
+    private String healthMessage = "Stay in the boat when the water is deep.";
     private boolean drivingBoat;
-    private String boatMessage = "B: board the boat when close to shore";
+    private boolean boatSummoned;
+    private boolean missionWon;
+    private boolean cleaningLockedMessageShown;
+    private float waterDamageCooldown;
+    private String boatMessage = "Press B in the playground to launch your rescue boat.";
 
 
     public TalambanGameScreen(CebuRisingWatersGame game) {
@@ -87,6 +97,8 @@ public class TalambanGameScreen extends ScreenAdapter {
         loadRescueObjects();
         loadBoat();
         loadFloodCleanup();
+        // Start at the safe playground so the boat is available right away.
+        movePlayerToSafeStart();
         hudCamera = new OrthographicCamera();
         hudViewport = new ScreenViewport(hudCamera);
 
@@ -158,14 +170,50 @@ public class TalambanGameScreen extends ScreenAdapter {
     }
 
     private void loadBoat() {
-        MapLayer boatLayer = map.getLayers().get("BoatSpawn");
-        if (boatLayer == null || boatLayer.getObjects().getCount() == 0) {
-            throw new IllegalStateException("BoatSpawn object layer missing");
+        // The player carries the boat. It appears after pressing B.
+        boat = new RescueBoat(0f, 0f, 2, 175f, 100f);
+        boatSummoned = false;
+    }
+
+    private void movePlayerToSafeStart() {
+        Rectangle safe = rescue.getEvacuationZone();
+        float x = safe.x + safe.width * 0.76f;
+        float y = safe.y + safe.height * 0.50f;
+        player.setPosition(x - PLAYER_SIZE / 2f, y - PLAYER_SIZE / 2f);
+    }
+
+    private boolean closeToDock(float x, float y) {
+        Rectangle safe = rescue.getEvacuationZone();
+        float nearestX = MathUtils.clamp(x, safe.x, safe.x + safe.width);
+        float nearestY = MathUtils.clamp(y, safe.y, safe.y + safe.height);
+        float dx = x - nearestX;
+        float dy = y - nearestY;
+        return dx * dx + dy * dy <= DOCK_RANGE * DOCK_RANGE;
+    }
+
+    private boolean findBoatLaunch() {
+        Rectangle safe = rescue.getEvacuationZone();
+        float right = safe.x + safe.width;
+        float top = safe.y + safe.height;
+        // Pick a shoreline spot without any building collisions.
+        float[][] spots = {
+            {right + 32f, safe.y + safe.height * 0.5f},
+            {right + 44f, safe.y + safe.height * 0.7f},
+            {right + 44f, safe.y + safe.height * 0.3f},
+            {safe.x + safe.width * 0.75f, top + 35f},
+            {safe.x + safe.width * 0.5f, top + 35f}
+        };
+        for (float[] spot : spots) {
+            if (!flood.canBoatOccupy(spot[0], spot[1], 18f)) continue;
+            Rectangle hitbox = new Rectangle(spot[0] - 18f, spot[1] - 18f, 36f, 36f);
+            boolean blocked = false;
+            for (Rectangle wall : walls) if (wall.overlaps(hitbox)) { blocked = true; break; }
+            if (!blocked) {
+                boat.getPosition().set(spot[0], spot[1]);
+                return true;
+            }
         }
-        MapObject spawn = boatLayer.getObjects().get(0);
-        float x = ((Number) spawn.getProperties().get("x")).floatValue();
-        float y = ((Number) spawn.getProperties().get("y")).floatValue();
-        boat = new RescueBoat(x, y, 2, 175f, 100f);
+        return false;
     }
 
     private void loadFloodCleanup() {
@@ -186,6 +234,12 @@ public class TalambanGameScreen extends ScreenAdapter {
         for (MapObject obj : garbage.getObjects()) {
             flood.addGarbage(new GarbagePile(obj.getName(), number(obj, "x", 0f), number(obj, "y", 0f)));
         }
+        MapLayer barrierLayer = map.getLayers().get("BarrierSpots");
+        if (barrierLayer != null) {
+            for (MapObject obj : barrierLayer.getObjects()) {
+                flood.addBarrier(new FloodBarrier(obj.getName(), number(obj, "x", 0f), number(obj, "y", 0f)));
+            }
+        }
     }
 
     private float number(MapObject obj, String key, float fallback) {
@@ -197,48 +251,52 @@ public class TalambanGameScreen extends ScreenAdapter {
     private float centerY() { return player.y + player.height / 2f; }
 
     private boolean nearBoat() {
-        return boat.getPosition().dst2(centerX(), centerY()) <= BOAT_RANGE * BOAT_RANGE;
-    }
-
-    private boolean isOnDryGround(float x, float y) {
-        Rectangle area = new Rectangle(x - PLAYER_SIZE / 2f, y - PLAYER_SIZE / 2f, PLAYER_SIZE, PLAYER_SIZE);
-        if (flood.isWet(x, y) || x < 0 || y < 0 || x > mapWidth || y > mapHeight) return false;
-        for (Rectangle wall : walls) if (wall.overlaps(area)) return false;
-        return true;
+        return boatSummoned && boat.getPosition().dst2(centerX(), centerY()) <= DOCK_RANGE * DOCK_RANGE;
     }
 
     private void toggleBoat() {
         if (drivingBoat) {
-            // Find a free spot on land beside the boat.
-            float bx = boat.getPosition().x;
-            float by = boat.getPosition().y;
-            float[][] offsets = {{0,-65},{0,65},{-65,0},{65,0},{-90,0},{90,0},{0,-90},{0,90}};
-            for (float[] offset : offsets) {
-                float x = bx + offset[0];
-                float y = by + offset[1];
-                if (!isOnDryGround(x, y)) continue;
-                player.setPosition(x - PLAYER_SIZE/2f, y - PLAYER_SIZE/2f);
-                drivingBoat = false;
-                boatMessage = "On shore. Press U near the boat to unload a passenger.";
+            if (!closeToDock(boat.getPosition().x, boat.getPosition().y)) {
+                boatMessage = "Return near the playground to leave the boat.";
                 return;
             }
-            boatMessage = "Go to the playground edge or wait for water to drain.";
-        } else {
-            if (rescue.isEscorting()) { boatMessage = "Finish your foot escort first."; return; }
-            if (!nearBoat()) { boatMessage = "Get closer to the boat to board."; return; }
-            if (!boat.canMove()) { boatMessage = "The boat needs repairs."; return; }
-            if (flood.getDepth() <= FloodSystem.BOAT_DEPTH) {
-                boatMessage = "The flood is too shallow for the boat.";
-                return;
-            }
-            drivingBoat = true;
-            boatMessage = "Driving boat. E: rescue | B: go ashore";
+            // Store the boat again when getting off at the playground.
+            drivingBoat = false;
+            boatSummoned = false;
+            movePlayerToSafeStart();
+            boatMessage = "Boat stored. Press B to launch it again.";
+            return;
         }
+        if (!rescue.isInEvacuationZone(centerX(), centerY())) {
+            boatMessage = "Go to the evacuation playground to launch the boat.";
+            return;
+        }
+        if (rescue.isEscorting()) {
+            boatMessage = "Finish your escort first.";
+            return;
+        }
+        if (!boat.canMove()) {
+            boatMessage = "Repair your boat first.";
+            return;
+        }
+        if (flood.getDepth() <= FloodSystem.BOAT_DEPTH) {
+            boatMessage = "The water is too shallow for the boat.";
+            return;
+        }
+        if (!findBoatLaunch()) {
+            boatMessage = "No free space beside the playground for the boat.";
+            return;
+        }
+        boatSummoned = true;
+        drivingBoat = true;
+        player.setPosition(boat.getPosition().x - PLAYER_SIZE/2f, boat.getPosition().y - PLAYER_SIZE/2f);
+        boatMessage = "Boat launched. Pick up civilians with E, unload at the playground with U.";
     }
 
     private void handleBoatControls(float delta) {
         if (Gdx.input.isKeyJustPressed(Input.Keys.B)) toggleBoat();
         if (drivingBoat) {
+            deepWaterTime = 0f;
             input.set(0, 0);
             if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) input.x--;
             if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) input.x++;
@@ -246,42 +304,94 @@ public class TalambanGameScreen extends ScreenAdapter {
             if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) input.y--;
             if (input.len2() > 0) input.nor().scl(boat.getSpeed());
             flood.currentAt(boat.getPosition().x, boat.getPosition().y, current);
-            // Hold C to anchor the boat while cleaning nearby drains.
+            // The water is calmer beside the evacuation playground.
+            if (closeToDock(boat.getPosition().x, boat.getPosition().y)) current.scl(0.18f);
             if (Gdx.input.isKeyPressed(Input.Keys.C)) current.scl(0.10f);
-            // Even when the player lets go, the current can keep pushing.
             boolean hit = boat.sail((input.x + current.x) * delta,
                     (input.y + current.y) * delta, flood, walls);
-            if (hit && current.len2() > 0f && collisionCooldown <= 0f) {
+            if (hit && current.len() >= 30f
+                    && !closeToDock(boat.getPosition().x, boat.getPosition().y)
+                    && !flood.isProtected(boat.getPosition().x, boat.getPosition().y)
+                    && collisionCooldown <= 0f) {
                 boat.takeDamage(10f);
-                collisionCooldown = 0.9f;
-                boatMessage = "Boat hit something! -10 HP";
+                collisionCooldown = 1.2f;
+                boatMessage = "Strong current collision! -10 boat HP";
             }
             if (!boat.canMove()) {
                 drivingBoat = false;
-                boatMessage = "Boat damaged. You can still walk and clean.";
+                boatMessage = "Boat destroyed. Press R to retry.";
             }
             player.setPosition(boat.getPosition().x - PLAYER_SIZE/2f, boat.getPosition().y - PLAYER_SIZE/2f);
         } else {
             updatePlayer(delta);
+            if (flood.isWet(centerX(), centerY())) {
+                // Walking in floodwater costs health right away and while staying there.
+                waterDamageCooldown -= delta;
+                if (waterDamageCooldown <= 0f) {
+                    playerHealth--;
+                    waterDamageCooldown = PLAYER_WATER_DAMAGE_INTERVAL;
+                    healthMessage = "Deep water! Lost 1 HP. Get back to the playground.";
+                }
+            } else {
+                waterDamageCooldown = 0f;
+            }
         }
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
             if (drivingBoat) rescue.pickUpByBoat(boat);
             else rescue.interact(centerX(), centerY());
         }
-        if (!drivingBoat && nearBoat() && Gdx.input.isKeyJustPressed(Input.Keys.U)) {
-            rescue.unloadFromBoat(boat, centerX(), centerY());
+        if (Gdx.input.isKeyJustPressed(Input.Keys.U)) {
+            if (!drivingBoat) {
+                boatMessage = "Board the rescue boat first (B).";
+            } else if (!closeToDock(boat.getPosition().x, boat.getPosition().y)) {
+                boatMessage = "Move near the playground border before unloading.";
+            } else if (boat.getPassengerCount() == 0) {
+                boatMessage = "There are no passengers to unload.";
+            } else {
+                int delivered = rescue.evacuateBoatPassengers(boat);
+                boatMessage = delivered + " civilians evacuated at the playground!";
+            }
         }
         if (!drivingBoat) rescue.update(centerX(), centerY());
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+            float x = drivingBoat ? boat.getPosition().x : centerX();
+            float y = drivingBoat ? boat.getPosition().y : centerY();
+            flood.placeBarrier(x, y);
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.H) && repairKits > 0
+                && boat.getHealth() < boat.getMaxHealth() && (drivingBoat || nearBoat()
+                || rescue.isInEvacuationZone(centerX(), centerY()))) {
+            boat.repair(35f);
+            repairKits--;
+            healthMessage = "Boat repaired (+35 HP).";
+        }
+
+        // Finish all rescues before the drains and garbage can be cleaned.
         boolean cleaning = Gdx.input.isKeyPressed(Input.Keys.C);
-        flood.clean(centerX(), centerY(), delta, cleaning,
-                Gdx.input.isKeyJustPressed(Input.Keys.C));
+        if (rescue.isComplete()) {
+            flood.clean(centerX(), centerY(), delta, cleaning,
+                    Gdx.input.isKeyJustPressed(Input.Keys.C));
+        } else {
+            flood.cancelCleaning();
+            if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
+                flood.setMessage("Rescue all civilians first (" + rescue.getEvacuatedCount()
+                        + "/" + rescue.getCivilianCount() + ").");
+            }
+        }
         flood.update(delta);
         rescue.setAllowWalkingForAll(flood.getDepth() <= FloodSystem.WALKABLE_DEPTH);
         collisionCooldown = Math.max(0f, collisionCooldown - delta);
+
+        if (rescue.isComplete() && flood.allClean() && flood.getDepth() <= 0.01f) {
+            missionWon = true;
+        }
         if (flood.getDepth() <= FloodSystem.BOAT_DEPTH && drivingBoat) {
-            // The boat stops once the water is too shallow.
             drivingBoat = false;
-            boatMessage = "Water is shallow now. Press U to unload.";
+            boatSummoned = false;
+            movePlayerToSafeStart();
+            boatMessage = "Flood cleared. Boat stored.";
         }
     }
 
@@ -289,11 +399,19 @@ public class TalambanGameScreen extends ScreenAdapter {
     public void render(float delta) {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             game.setScreen(new MainMenuScreen(game));
+            dispose();
             return;
         }
-        if (!boat.canMove()) {
+        if (missionWon) {
             if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
                 game.setScreen(new TalambanGameScreen(game));
+                dispose();
+                return;
+            }
+        } else if (!boat.canMove() || playerHealth <= 0) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+                game.setScreen(new TalambanGameScreen(game));
+                dispose();
                 return;
             }
         } else {
@@ -311,10 +429,12 @@ public class TalambanGameScreen extends ScreenAdapter {
         shapes.setProjectionMatrix(camera.combined);
         shapes.begin(ShapeRenderer.ShapeType.Filled);
         // Yellow boat marker until we add our real boat sprite.
-        shapes.setColor(drivingBoat ? Color.GOLD : Color.ORANGE);
-        shapes.ellipse(boat.getPosition().x - 24f, boat.getPosition().y - 17f, 48f, 34f);
-        shapes.setColor(Color.DARK_GRAY);
-        shapes.rect(boat.getPosition().x - 12f, boat.getPosition().y - 7f, 24f, 14f);
+        if (boatSummoned) {
+            shapes.setColor(drivingBoat ? Color.GOLD : Color.ORANGE);
+            shapes.ellipse(boat.getPosition().x - 24f, boat.getPosition().y - 17f, 48f, 34f);
+            shapes.setColor(Color.DARK_GRAY);
+            shapes.rect(boat.getPosition().x - 12f, boat.getPosition().y - 7f, 24f, 14f);
+        }
         if (!drivingBoat) {
             shapes.setColor(Color.valueOf("F8DF73"));
             shapes.rect(player.x, player.y, player.width, player.height);
@@ -323,12 +443,21 @@ public class TalambanGameScreen extends ScreenAdapter {
         }
         shapes.end();
 
-        // White = waiting, cyan = following, orange = needs a boat.
+        // Mark the barrier spots before the mission art is added.
+        shapes.begin(ShapeRenderer.ShapeType.Filled);
+        for (FloodBarrier barrier : flood.getBarriers()) {
+            shapes.setColor(barrier.isPlaced() ? Color.GREEN : Color.ORANGE);
+            float x = barrier.getPosition().x;
+            float y = barrier.getPosition().y;
+            shapes.rect(x - 15f, y - 6f, 30f, 12f);
+        }
+        shapes.end();
+
+        // White civilians are waiting, cyan is being escorted.
         shapes.begin(ShapeRenderer.ShapeType.Filled);
         for (Civilian civilian : rescue.getCivilians()) {
             if (civilian.isEvacuated() || civilian.getState() == Civilian.State.BOARDED) continue;
             if (civilian.getState() == Civilian.State.ESCORTED) shapes.setColor(Color.CYAN);
-            else if (civilian.requiresBoat()) shapes.setColor(Color.ORANGE);
             else shapes.setColor(Color.WHITE);
             shapes.circle(civilian.getPosition().x, civilian.getPosition().y, CIVILIAN_RADIUS);
             shapes.setColor(Color.DARK_GRAY);
@@ -354,29 +483,34 @@ public class TalambanGameScreen extends ScreenAdapter {
             shapes.end();
         }
         // Draw the text after the map so it stays on screen.
-        hudViewport.apply()
-        ;
+        hudViewport.apply();
         batch.setProjectionMatrix(hudCamera.combined);
         batch.begin();
         font.setColor(Color.WHITE);
         float top = Gdx.graphics.getHeight() - 18f;
-        font.draw(batch, "MISSION 1: TALAMBAN | WASD Move | B Boat | E Rescue | U Unload | Hold C Clean | F3/F4 Debug | ESC", 14f, top);
+        font.draw(batch, "MISSION 1: TALAMBAN | B Launch/Store | E Rescue | U Dock & Unload | C Clean | P Barrier | H Repair | ESC", 14f, top);
         font.draw(batch, "Evacuated: " + rescue.getEvacuatedCount() + "/" + rescue.getCivilianCount()
             + "  |  " + (rescue.isComplete() ? "All civilians safe!" : rescue.getMessage()), 14f, top - 22f);
         font.draw(batch, "Boat HP " + (int)boat.getHealth() + "/" + (int)boat.getMaxHealth()
                 + "  |  Passengers " + boat.getPassengerCount() + "/" + boat.getCapacity()
                 + "  |  " + (drivingBoat ? "IN BOAT" : "ON FOOT"), 14f, top - 44f);
-        font.draw(batch, "Flood: " + (int)(flood.getDepth() * 100f) + "% | Cleanup: "
+        font.draw(batch, "Player HP: " + playerHealth + "/3 | Repair kits: " + repairKits
+                + " | Barriers: " + flood.getBarrierSupplies() + " | " + healthMessage, 14f, top - 66f);
+        font.draw(batch, "Stage: " + (rescue.isComplete() ? "CLEANUP" : "RESCUE FIRST")
+                + " | Flood: " + (int)(flood.getDepth() * 100f) + "% | Cleanup: "
                 + flood.getFinishedTasks() + "/" + flood.getTotalTasks()
-                + " | Garbage cleaners: " + flood.getCleaners(), 14f, top - 66f);
-        font.draw(batch, flood.getMessage(), 14f, top - 88f);
-        font.draw(batch, boat.canMove() ? boatMessage : "BOAT DESTROYED - Press R to retry, ESC for menu",
-                14f, top - 110f);
+                + " | Garbage cleaners: " + flood.getCleaners(), 14f, top - 88f);
+        font.draw(batch, flood.getMessage(), 14f, top - 110f);
+        font.draw(batch, flood.getBarrierMessage(), 14f, top - 132f);
+        font.draw(batch, missionWon ? "MISSION SUCCESS! Everyone safe and flood cleared. Press R to replay."
+                : !boat.canMove() || playerHealth <= 0
+                ? "RESCUE FAILED - Press R to retry, ESC for menu" : boatMessage,
+                14f, top - 154f);
         if (flood.allClean() && flood.getDepth() <= 0.01f) {
-            font.draw(batch, "All drains and garbage cleared! Flood gone.", 14f, top - 132f);
+            font.draw(batch, "All drains and garbage cleared! Flood gone.", 14f, top - 176f);
         }
-        if (!drivingBoat && rescue.getEscorted() == null && nearBoat() && boat.getPassengerCount() > 0) {
-            font.draw(batch, "Press U to help one passenger off the boat.", 14f, top - 154f);
+        if (drivingBoat && boat.getPassengerCount() > 0) {
+            font.draw(batch, "Passengers aboard: return near the playground, then press U.", 14f, top - 198f);
         }
         batch.end();
     }
@@ -399,22 +533,6 @@ public class TalambanGameScreen extends ScreenAdapter {
         shapes.rect(0f, 0f, mapWidth, bottom);
         shapes.rect(0f, bottom, left, top - bottom);
         shapes.rect(right, bottom, mapWidth-right, top-bottom);
-        shapes.end();
-        // Show where the currents are flowing.
-        shapes.begin(ShapeRenderer.ShapeType.Line);
-        shapes.setColor(0.75f, 0.94f, 1f, 0.28f + 0.35f * depth);
-        for (float y = 100f; y < mapHeight; y += 170f) {
-            for (float x = 110f; x < mapWidth; x += 220f) {
-                if (!flood.isWet(x, y)) continue;
-                flood.currentAt(x, y, current);
-                float endX = x + current.x * 0.37f;
-                float endY = y + current.y * 0.37f;
-                shapes.line(x, y, endX, endY);
-                float d = current.x >= 0f ? -1f : 1f;
-                shapes.line(endX, endY, endX + d * 9f, endY + 5f);
-                shapes.line(endX, endY, endX + d * 9f, endY - 5f);
-            }
-        }
         shapes.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
     }

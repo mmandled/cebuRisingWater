@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="40" height="24" tilewidth="48" tileheight="48" infinite="0" nextlayerid="15" nextobjectid="33">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="40" height="24" tilewidth="48" tileheight="48" infinite="0" nextlayerid="16" nextobjectid="36">
   <tileset firstgid="1" source="../../tilesets/urban/A2_Modern_City_Rasak.tsx" />
   <tileset firstgid="193" source="../../tilesets/urban/A3_Modern_Outside_Rasak.tsx" />
   <tileset firstgid="321" source="../../tilesets/urban/A4_Modern_Outside_Rasak.tsx" />
@@ -161,7 +161,7 @@
     <object id="7" name="Townhouse row" type="building" x="1632" y="672" width="288" height="240" />
   </objectgroup>
   <objectgroup id="7" name="PlayerSpawn">
-    <object id="10" name="player-start" type="PlayerSpawn" x="1128" y="1128">
+    <object id="10" name="player-start" type="PlayerSpawn" x="327.8" y="957">
       <point />
     </object>
   </objectgroup>
@@ -262,6 +262,11 @@
     <object id="28" name="garbage_04" x="1419.33" y="932">
       <point />
     </object>
+  </objectgroup>
+  <objectgroup id="15" name="BarrierSpots">
+    <object id="33" name="barrier_01" type="FloodBarrier" x="445" y="565" />
+    <object id="34" name="barrier_02" type="FloodBarrier" x="1492" y="282" />
+    <object id="35" name="barrier_03" type="FloodBarrier" x="1385" y="925" />
   </objectgroup>
   <objectgroup id="12" name="FloodZones">
     <object id="29" name="flood_01" x="12.1212" y="57.5758" width="1909.09" height="484.848" />

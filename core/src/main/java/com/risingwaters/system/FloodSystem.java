@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import com.risingwaters.model.CleanupTarget;
 import com.risingwaters.model.Drainage;
 import com.risingwaters.model.GarbagePile;
+import com.risingwaters.model.FloodBarrier;
 
 // Handles water levels, cleanup, and the moving currents.
 public final class FloodSystem {
@@ -18,6 +19,11 @@ public final class FloodSystem {
     private final Rectangle evacuation;
     private final Array<Drainage> drains = new Array<>();
     private final Array<GarbagePile> garbage = new Array<>();
+    private final Array<FloodBarrier> barriers = new Array<>();
+    private static final float BARRIER_RANGE = 118f;
+    private static final float PROTECTION_RADIUS = 175f;
+    private int barrierSupplies = 3;
+    private String barrierMessage = "P: place a barrier near a marked spot.";
     private float depth = 1f;
     private float targetDepth = 1f;
     private int cleaners = 4;
@@ -33,6 +39,33 @@ public final class FloodSystem {
 
     public void addDrain(Drainage drain) { drains.add(drain); }
     public void addGarbage(GarbagePile pile) { garbage.add(pile); }
+    public void addBarrier(FloodBarrier barrier) { barriers.add(barrier); }
+    public Array<FloodBarrier> getBarriers() { return barriers; }
+    public int getBarrierSupplies() { return barrierSupplies; }
+    public String getBarrierMessage() { return barrierMessage; }
+
+    public boolean isProtected(float x, float y) {
+        float r2 = PROTECTION_RADIUS * PROTECTION_RADIUS;
+        for (FloodBarrier barrier : barriers) {
+            if (barrier.isPlaced() && barrier.getPosition().dst2(x, y) <= r2) return true;
+        }
+        return false;
+    }
+
+    public void placeBarrier(float x, float y) {
+        FloodBarrier closest = null;
+        float best = BARRIER_RANGE * BARRIER_RANGE;
+        for (FloodBarrier barrier : barriers) {
+            if (barrier.isPlaced()) continue;
+            float dist = barrier.getPosition().dst2(x, y);
+            if (dist <= best) { closest = barrier; best = dist; }
+        }
+        if (closest == null) { barrierMessage = "Move closer to a barrier spot."; return; }
+        if (barrierSupplies <= 0) { barrierMessage = "No barriers left."; return; }
+        closest.place();
+        barrierSupplies--;
+        barrierMessage = closest.getId() + " placed. Current is weaker nearby.";
+    }
     public Array<Drainage> getDrains() { return drains; }
     public Array<GarbagePile> getGarbage() { return garbage; }
     public Rectangle getEvacuation() { return evacuation; }
@@ -40,6 +73,7 @@ public final class FloodSystem {
     public float getTargetDepth() { return targetDepth; }
     public int getCleaners() { return cleaners; }
     public String getMessage() { return message; }
+    public void setMessage(String text) { message = text; }
     public float getCleaningProgress() { return cleaningProgress; }
     public Drainage getCleaningDrain() { return cleaningDrain; }
 
@@ -73,7 +107,8 @@ public final class FloodSystem {
         int lane = (int)(y / 220f);
         float direction = lane % 2 == 0 ? -1f : 1f;
         float vertical = (float)Math.sin(x / 290f + lane) * 0.32f;
-        return out.set(direction, vertical).nor().scl(75f * depth);
+        float strength = isProtected(x, y) ? 0.25f : 1f;
+        return out.set(direction, vertical).nor().scl(75f * depth * strength);
     }
 
     public void update(float delta) {

@@ -13,7 +13,7 @@ public final class RescueController {
     private final Rectangle evacuationZone;
     private Civilian escorted;
     private boolean allowWalkingForAll;
-    private String message = "Approach a civilian and press E to escort.";
+    private String message = "Use the boat to rescue civilians during flooding.";
 
     public RescueController(Array<Civilian> civilians, Rectangle evacuationZone) {
         this.civilians = civilians;
@@ -26,7 +26,7 @@ public final class RescueController {
         Civilian nearest = null;
         float maxDistance2 = INTERACTION_RANGE * INTERACTION_RANGE;
         for (Civilian civilian : civilians) {
-            if (!civilian.isWaiting() || (civilian.requiresBoat() && !allowWalkingForAll)) continue;
+            if (!civilian.isWaiting() || !allowWalkingForAll) continue;
             float d2 = civilian.getPosition().dst2(x, y);
             if (d2 <= maxDistance2) {
                 nearest = civilian;
@@ -43,7 +43,7 @@ public final class RescueController {
         }
         Civilian nearest = nearestAvailable(x, y);
         if (nearest == null) {
-            message = "No walkable civilian nearby. Move closer.";
+            message = allowWalkingForAll ? "No civilian nearby. Move closer." : "Too deep to walk-rescue. Use the boat.";
             return;
         }
         nearest.beginEscort(allowWalkingForAll);
@@ -65,7 +65,7 @@ public final class RescueController {
         Civilian nearest = null;
         float best = INTERACTION_RANGE * INTERACTION_RANGE;
         for (Civilian c : civilians) {
-            if (!c.isWaiting() || !c.requiresBoat()) continue;
+            if (!c.isWaiting()) continue;
             float d = c.getPosition().dst2(x, y);
             if (d <= best) { nearest = c; best = d; }
         }
@@ -86,6 +86,21 @@ public final class RescueController {
         escorted = civilian;
         escorted.follow(x - 22f, y - 22f);
         message = "Escort " + civilian.getId() + " to the evacuation playground.";
+    }
+
+    public int evacuateBoatPassengers(RescueBoat boat) {
+        int delivered = 0;
+        // The playground staff receive passengers straight from the boat.
+        Civilian passenger;
+        while ((passenger = boat.unloadOne()) != null) {
+            passenger.completeEvacuation();
+            delivered++;
+        }
+        if (delivered > 0) {
+            message = delivered + " passengers safe! " + getEvacuatedCount()
+                    + "/" + civilians.size + " evacuated.";
+        }
+        return delivered;
     }
 
     public boolean isEscorting() { return escorted != null; }

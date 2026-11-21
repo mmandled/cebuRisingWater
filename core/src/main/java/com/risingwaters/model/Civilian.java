@@ -28,7 +28,7 @@ public final class Civilian {
     public void beginEscort() { beginEscort(false); }
 
     public void beginEscort(boolean waterIsGone) {
-        if (state != State.WAITING || (requiresBoat && !waterIsGone)) {
+        if (state != State.WAITING || !waterIsGone) {
             throw new IllegalStateException("Civilian cannot be escorted on foot: " + id);
         }
         state = State.ESCORTED;
