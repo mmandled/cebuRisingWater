@@ -12,6 +12,7 @@ public final class RescueController {
     private final Array<Civilian> civilians;
     private final Rectangle evacuationZone;
     private Civilian escorted;
+    private boolean allowWalkingForAll;
     private String message = "Approach a civilian and press E to escort.";
 
     public RescueController(Array<Civilian> civilians, Rectangle evacuationZone) {
@@ -19,11 +20,13 @@ public final class RescueController {
         this.evacuationZone = new Rectangle(evacuationZone);
     }
 
+    public void setAllowWalkingForAll(boolean allowed) { allowWalkingForAll = allowed; }
+
     public Civilian nearestAvailable(float x, float y) {
         Civilian nearest = null;
         float maxDistance2 = INTERACTION_RANGE * INTERACTION_RANGE;
         for (Civilian civilian : civilians) {
-            if (!civilian.isWaiting() || civilian.requiresBoat()) continue;
+            if (!civilian.isWaiting() || (civilian.requiresBoat() && !allowWalkingForAll)) continue;
             float d2 = civilian.getPosition().dst2(x, y);
             if (d2 <= maxDistance2) {
                 nearest = civilian;
@@ -43,7 +46,7 @@ public final class RescueController {
             message = "No walkable civilian nearby. Move closer.";
             return;
         }
-        nearest.beginEscort();
+        nearest.beginEscort(allowWalkingForAll);
         escorted = nearest;
         message = "Escorting " + nearest.getId() + ". Go to the evacuation playground!";
     }

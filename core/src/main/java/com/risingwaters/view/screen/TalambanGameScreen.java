@@ -16,6 +16,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.risingwaters.model.Civilian;
 import com.risingwaters.model.RescueBoat;
+import com.risingwaters.model.Drainage;
+import com.risingwaters.model.GarbagePile;
+import com.risingwaters.system.FloodSystem;
+import com.badlogic.gdx.graphics.GL20;
 import com.risingwaters.controller.RescueController;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -57,7 +61,9 @@ public class TalambanGameScreen extends ScreenAdapter {
     private static final float CIVILIAN_RADIUS = 14f;
     private static final float BOAT_RANGE = 112f;
     private RescueBoat boat;
-    private Rectangle boatWater;
+    private FloodSystem flood;
+    private final Vector2 current = new Vector2();
+    private float collisionCooldown;
     private boolean drivingBoat;
     private String boatMessage = "B: board the boat when close to shore";
 
@@ -80,6 +86,7 @@ public class TalambanGameScreen extends ScreenAdapter {
         loadPlayerSpawn();
         loadRescueObjects();
         loadBoat();
+        loadFloodCleanup();
         hudCamera = new OrthographicCamera();
         hudViewport = new ScreenViewport(hudCamera);
 
@@ -151,23 +158,39 @@ public class TalambanGameScreen extends ScreenAdapter {
     }
 
     private void loadBoat() {
-        MapLayer floodLayer = map.getLayers().get("FloodZones");
         MapLayer boatLayer = map.getLayers().get("BoatSpawn");
-        if (floodLayer == null || boatLayer == null || boatLayer.getObjects().getCount() == 0) {
-            throw new IllegalStateException("Missing FloodZones or BoatSpawn layer");
+        if (boatLayer == null || boatLayer.getObjects().getCount() == 0) {
+            throw new IllegalStateException("BoatSpawn object layer missing");
         }
-        for (MapObject obj : floodLayer.getObjects()) {
-            if (obj instanceof RectangleMapObject) {
-                boatWater = new Rectangle(((RectangleMapObject) obj).getRectangle());
-                break;
-            }
-        }
-        if (boatWater == null) throw new IllegalStateException("FloodZones needs a rectangle");
         MapObject spawn = boatLayer.getObjects().get(0);
         float x = ((Number) spawn.getProperties().get("x")).floatValue();
         float y = ((Number) spawn.getProperties().get("y")).floatValue();
-        // These are starting values. We can connect them to the shop later.
         boat = new RescueBoat(x, y, 2, 175f, 100f);
+    }
+
+    private void loadFloodCleanup() {
+        flood = new FloodSystem(mapWidth, mapHeight, rescue.getEvacuationZone());
+        MapLayer drains = map.getLayers().get("Drainage");
+        MapLayer garbage = map.getLayers().get("Garbage");
+        if (drains == null || garbage == null) {
+            throw new IllegalStateException("Missing Drainage or Garbage object layer");
+        }
+        for (MapObject obj : drains.getObjects()) {
+            float x = number(obj, "x", 0f);
+            float y = number(obj, "y", 0f);
+            boolean clogged = Boolean.TRUE.equals(obj.getProperties().get("clogged"));
+            float time = number(obj, "cleaningTime", 5f);
+            float reduction = number(obj, "floodReduction", 0.2f);
+            flood.addDrain(new Drainage(obj.getName(), x, y, clogged, time, reduction));
+        }
+        for (MapObject obj : garbage.getObjects()) {
+            flood.addGarbage(new GarbagePile(obj.getName(), number(obj, "x", 0f), number(obj, "y", 0f)));
+        }
+    }
+
+    private float number(MapObject obj, String key, float fallback) {
+        Object value = obj.getProperties().get(key);
+        return value instanceof Number ? ((Number)value).floatValue() : fallback;
     }
 
     private float centerX() { return player.x + player.width / 2f; }
@@ -179,7 +202,7 @@ public class TalambanGameScreen extends ScreenAdapter {
 
     private boolean isOnDryGround(float x, float y) {
         Rectangle area = new Rectangle(x - PLAYER_SIZE / 2f, y - PLAYER_SIZE / 2f, PLAYER_SIZE, PLAYER_SIZE);
-        if (boatWater.overlaps(area) || x < 0 || y < 0 || x > mapWidth || y > mapHeight) return false;
+        if (flood.isWet(x, y) || x < 0 || y < 0 || x > mapWidth || y > mapHeight) return false;
         for (Rectangle wall : walls) if (wall.overlaps(area)) return false;
         return true;
     }
@@ -199,11 +222,15 @@ public class TalambanGameScreen extends ScreenAdapter {
                 boatMessage = "On shore. Press U near the boat to unload a passenger.";
                 return;
             }
-            boatMessage = "Move the boat close to a dry shore before leaving.";
+            boatMessage = "Go to the playground edge or wait for water to drain.";
         } else {
             if (rescue.isEscorting()) { boatMessage = "Finish your foot escort first."; return; }
             if (!nearBoat()) { boatMessage = "Get closer to the boat to board."; return; }
             if (!boat.canMove()) { boatMessage = "The boat needs repairs."; return; }
+            if (flood.getDepth() <= FloodSystem.BOAT_DEPTH) {
+                boatMessage = "The flood is too shallow for the boat.";
+                return;
+            }
             drivingBoat = true;
             boatMessage = "Driving boat. E: rescue | B: go ashore";
         }
@@ -217,8 +244,22 @@ public class TalambanGameScreen extends ScreenAdapter {
             if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) input.x++;
             if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) input.y++;
             if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) input.y--;
-            if (input.len2() > 0) input.nor().scl(boat.getSpeed() * delta);
-            boat.move(input.x, input.y, boatWater, walls);
+            if (input.len2() > 0) input.nor().scl(boat.getSpeed());
+            flood.currentAt(boat.getPosition().x, boat.getPosition().y, current);
+            // Hold C to anchor the boat while cleaning nearby drains.
+            if (Gdx.input.isKeyPressed(Input.Keys.C)) current.scl(0.10f);
+            // Even when the player lets go, the current can keep pushing.
+            boolean hit = boat.sail((input.x + current.x) * delta,
+                    (input.y + current.y) * delta, flood, walls);
+            if (hit && current.len2() > 0f && collisionCooldown <= 0f) {
+                boat.takeDamage(10f);
+                collisionCooldown = 0.9f;
+                boatMessage = "Boat hit something! -10 HP";
+            }
+            if (!boat.canMove()) {
+                drivingBoat = false;
+                boatMessage = "Boat damaged. You can still walk and clean.";
+            }
             player.setPosition(boat.getPosition().x - PLAYER_SIZE/2f, boat.getPosition().y - PLAYER_SIZE/2f);
         } else {
             updatePlayer(delta);
@@ -231,6 +272,17 @@ public class TalambanGameScreen extends ScreenAdapter {
             rescue.unloadFromBoat(boat, centerX(), centerY());
         }
         if (!drivingBoat) rescue.update(centerX(), centerY());
+        boolean cleaning = Gdx.input.isKeyPressed(Input.Keys.C);
+        flood.clean(centerX(), centerY(), delta, cleaning,
+                Gdx.input.isKeyJustPressed(Input.Keys.C));
+        flood.update(delta);
+        rescue.setAllowWalkingForAll(flood.getDepth() <= FloodSystem.WALKABLE_DEPTH);
+        collisionCooldown = Math.max(0f, collisionCooldown - delta);
+        if (flood.getDepth() <= FloodSystem.BOAT_DEPTH && drivingBoat) {
+            // The boat stops once the water is too shallow.
+            drivingBoat = false;
+            boatMessage = "Water is shallow now. Press U to unload.";
+        }
     }
 
     @Override
@@ -239,14 +291,22 @@ public class TalambanGameScreen extends ScreenAdapter {
             game.setScreen(new MainMenuScreen(game));
             return;
         }
+        if (!boat.canMove()) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+                game.setScreen(new TalambanGameScreen(game));
+                return;
+            }
+        } else {
+            handleBoatControls(Math.min(delta, 1f / 30f));
+        }
         if (Gdx.input.isKeyJustPressed(Input.Keys.F3)) collisionDebug = !collisionDebug;
         if (Gdx.input.isKeyJustPressed(Input.Keys.F4)) floodDebug = !floodDebug;
 
-        handleBoatControls(Math.min(delta, 1f / 30f));
         viewport.apply();
         ScreenUtils.clear(0.10f, 0.12f, 0.14f, 1f);
         mapRenderer.setView(camera);
         mapRenderer.render();
+        drawFlood();
 
         shapes.setProjectionMatrix(camera.combined);
         shapes.begin(ShapeRenderer.ShapeType.Filled);
@@ -279,7 +339,10 @@ public class TalambanGameScreen extends ScreenAdapter {
         if (floodDebug) {
             shapes.begin(ShapeRenderer.ShapeType.Line);
             shapes.setColor(Color.CYAN);
-            shapes.rect(boatWater.x, boatWater.y, boatWater.width, boatWater.height);
+            shapes.rect(0, 0, mapWidth, mapHeight);
+            Rectangle safe = flood.getEvacuation();
+            shapes.setColor(Color.GREEN);
+            shapes.rect(safe.x, safe.y, safe.width, safe.height);
             shapes.end();
         }
         if (collisionDebug) {
@@ -291,22 +354,69 @@ public class TalambanGameScreen extends ScreenAdapter {
             shapes.end();
         }
         // Draw the text after the map so it stays on screen.
-        hudViewport.apply();
+        hudViewport.apply()
+        ;
         batch.setProjectionMatrix(hudCamera.combined);
         batch.begin();
         font.setColor(Color.WHITE);
         float top = Gdx.graphics.getHeight() - 18f;
-        font.draw(batch, "MISSION 1: TALAMBAN | WASD Move | B Boat | E Rescue | U Unload | F3 Collisions | F4 Flood | ESC Menu", 14f, top);
+        font.draw(batch, "MISSION 1: TALAMBAN | WASD Move | B Boat | E Rescue | U Unload | Hold C Clean | F3/F4 Debug | ESC", 14f, top);
         font.draw(batch, "Evacuated: " + rescue.getEvacuatedCount() + "/" + rescue.getCivilianCount()
             + "  |  " + (rescue.isComplete() ? "All civilians safe!" : rescue.getMessage()), 14f, top - 22f);
         font.draw(batch, "Boat HP " + (int)boat.getHealth() + "/" + (int)boat.getMaxHealth()
                 + "  |  Passengers " + boat.getPassengerCount() + "/" + boat.getCapacity()
                 + "  |  " + (drivingBoat ? "IN BOAT" : "ON FOOT"), 14f, top - 44f);
-        font.draw(batch, boatMessage, 14f, top - 66f);
+        font.draw(batch, "Flood: " + (int)(flood.getDepth() * 100f) + "% | Cleanup: "
+                + flood.getFinishedTasks() + "/" + flood.getTotalTasks()
+                + " | Garbage cleaners: " + flood.getCleaners(), 14f, top - 66f);
+        font.draw(batch, flood.getMessage(), 14f, top - 88f);
+        font.draw(batch, boat.canMove() ? boatMessage : "BOAT DESTROYED - Press R to retry, ESC for menu",
+                14f, top - 110f);
+        if (flood.allClean() && flood.getDepth() <= 0.01f) {
+            font.draw(batch, "All drains and garbage cleared! Flood gone.", 14f, top - 132f);
+        }
         if (!drivingBoat && rescue.getEscorted() == null && nearBoat() && boat.getPassengerCount() > 0) {
-            font.draw(batch, "Press U to help one passenger off the boat.", 14f, top - 88f);
+            font.draw(batch, "Press U to help one passenger off the boat.", 14f, top - 154f);
         }
         batch.end();
+    }
+
+    private void drawFlood() {
+        float depth = flood.getDepth();
+        if (depth <= 0.005f) return;
+        Rectangle safe = flood.getEvacuation();
+        float left = MathUtils.clamp(safe.x, 0f, mapWidth);
+        float right = MathUtils.clamp(safe.x + safe.width, 0f, mapWidth);
+        float bottom = MathUtils.clamp(safe.y, 0f, mapHeight);
+        float top = MathUtils.clamp(safe.y + safe.height, 0f, mapHeight);
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        shapes.setProjectionMatrix(camera.combined);
+        shapes.begin(ShapeRenderer.ShapeType.Filled);
+        shapes.setColor(0.10f, 0.49f, 0.82f, 0.13f + 0.28f * depth);
+        // Leave the playground dry.
+        shapes.rect(0f, top, mapWidth, mapHeight - top);
+        shapes.rect(0f, 0f, mapWidth, bottom);
+        shapes.rect(0f, bottom, left, top - bottom);
+        shapes.rect(right, bottom, mapWidth-right, top-bottom);
+        shapes.end();
+        // Show where the currents are flowing.
+        shapes.begin(ShapeRenderer.ShapeType.Line);
+        shapes.setColor(0.75f, 0.94f, 1f, 0.28f + 0.35f * depth);
+        for (float y = 100f; y < mapHeight; y += 170f) {
+            for (float x = 110f; x < mapWidth; x += 220f) {
+                if (!flood.isWet(x, y)) continue;
+                flood.currentAt(x, y, current);
+                float endX = x + current.x * 0.37f;
+                float endY = y + current.y * 0.37f;
+                shapes.line(x, y, endX, endY);
+                float d = current.x >= 0f ? -1f : 1f;
+                shapes.line(endX, endY, endX + d * 9f, endY + 5f);
+                shapes.line(endX, endY, endX + d * 9f, endY - 5f);
+            }
+        }
+        shapes.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
     }
 
     private void updatePlayer(float delta) {
@@ -315,7 +425,9 @@ public class TalambanGameScreen extends ScreenAdapter {
         if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) input.x++;
         if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) input.y++;
         if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) input.y--;
-        if (input.len2() > 0) input.nor().scl(SPEED * delta);
+        // Walking in deep water is slower than on dry ground.
+        float walkingSpeed = flood.isWet(centerX(), centerY()) ? SPEED * 0.65f : SPEED;
+        if (input.len2() > 0) input.nor().scl(walkingSpeed * delta);
         moveAxis(input.x, true);
         moveAxis(input.y, false);
     }

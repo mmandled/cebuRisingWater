@@ -3,6 +3,7 @@ package com.risingwaters.model;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.risingwaters.system.FloodSystem;
 
 public class RescueBoat {
     private final Vector2 position;
@@ -37,6 +38,18 @@ public class RescueBoat {
         if (!water.contains(hitbox)) return;
         for (Rectangle wall : walls) if (wall.overlaps(hitbox)) return;
         position.set(newX, newY);
+    }
+
+    // Returns true if the boat bumped into something.
+    public boolean sail(float dx, float dy, FloodSystem flood, Array<Rectangle> walls) {
+        if (!canMove()) return false;
+        float nextX = position.x + dx;
+        float nextY = position.y + dy;
+        Rectangle hitbox = new Rectangle(nextX - 18f, nextY - 18f, 36f, 36f);
+        if (!flood.canBoatOccupy(nextX, nextY, 18f)) return true;
+        for (Rectangle wall : walls) if (wall.overlaps(hitbox)) return true;
+        position.set(nextX, nextY);
+        return false;
     }
 
     public boolean board(Civilian civilian) {
