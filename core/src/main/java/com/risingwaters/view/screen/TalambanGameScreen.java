@@ -32,6 +32,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.risingwaters.CebuRisingWatersGame;
+import com.risingwaters.mission.Mission;
+import com.risingwaters.mission.MissionObjective;
+import com.risingwaters.mission.MissionResult;
+import com.risingwaters.mission.TalambanMission;
 
 // Talamban gameplay screen. The player and boat are placeholders for now.
 public class TalambanGameScreen extends ScreenAdapter {
@@ -72,7 +76,7 @@ public class TalambanGameScreen extends ScreenAdapter {
     private String healthMessage = "Stay in the boat when the water is deep.";
     private boolean drivingBoat;
     private boolean boatSummoned;
-    private boolean missionWon;
+    private TalambanMission mission;
     private boolean cleaningLockedMessageShown;
     private float waterDamageCooldown;
     private String boatMessage = "Press B in the playground to launch your rescue boat.";
@@ -97,6 +101,7 @@ public class TalambanGameScreen extends ScreenAdapter {
         loadRescueObjects();
         loadBoat();
         loadFloodCleanup();
+        mission = new TalambanMission(rescue, flood);
         // Start at the safe playground so the boat is available right away.
         movePlayerToSafeStart();
         hudCamera = new OrthographicCamera();
@@ -384,9 +389,6 @@ public class TalambanGameScreen extends ScreenAdapter {
         rescue.setAllowWalkingForAll(flood.getDepth() <= FloodSystem.WALKABLE_DEPTH);
         collisionCooldown = Math.max(0f, collisionCooldown - delta);
 
-        if (rescue.isComplete() && flood.allClean() && flood.getDepth() <= 0.01f) {
-            missionWon = true;
-        }
         if (flood.getDepth() <= FloodSystem.BOAT_DEPTH && drivingBoat) {
             drivingBoat = false;
             boatSummoned = false;
@@ -402,20 +404,15 @@ public class TalambanGameScreen extends ScreenAdapter {
             dispose();
             return;
         }
-        if (missionWon) {
-            if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-                game.setScreen(new TalambanGameScreen(game));
-                dispose();
-                return;
-            }
-        } else if (!boat.canMove() || playerHealth <= 0) {
-            if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-                game.setScreen(new TalambanGameScreen(game));
-                dispose();
-                return;
-            }
-        } else {
-            handleBoatControls(Math.min(delta, 1f / 30f));
+        float step = Math.min(delta, 1f / 30f);
+        if (!mission.isFinished()) handleBoatControls(step);
+        mission.update(step, rescue, flood, boat, playerHealth);
+        if (mission.isFinished()) {
+            MissionResult result = mission.makeResult(rescue, flood, boat, playerHealth, repairKits);
+            if (result.isSuccess()) game.awardTalambanOnce(result.getReward());
+            game.setScreen(new MissionResultScreen(game, result));
+            dispose();
+            return;
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.F3)) collisionDebug = !collisionDebug;
         if (Gdx.input.isKeyJustPressed(Input.Keys.F4)) floodDebug = !floodDebug;
@@ -502,16 +499,22 @@ public class TalambanGameScreen extends ScreenAdapter {
                 + " | Garbage cleaners: " + flood.getCleaners(), 14f, top - 88f);
         font.draw(batch, flood.getMessage(), 14f, top - 110f);
         font.draw(batch, flood.getBarrierMessage(), 14f, top - 132f);
-        font.draw(batch, missionWon ? "MISSION SUCCESS! Everyone safe and flood cleared. Press R to replay."
-                : !boat.canMove() || playerHealth <= 0
-                ? "RESCUE FAILED - Press R to retry, ESC for menu" : boatMessage,
-                14f, top - 154f);
+        font.draw(batch, boatMessage, 14f, top - 154f);
         if (flood.allClean() && flood.getDepth() <= 0.01f) {
             font.draw(batch, "All drains and garbage cleared! Flood gone.", 14f, top - 176f);
         }
         if (drivingBoat && boat.getPassengerCount() > 0) {
             font.draw(batch, "Passengers aboard: return near the playground, then press U.", 14f, top - 198f);
         }
+        // Mission progress stays visible while playing.
+        float objectiveY = top - 226f;
+        for (MissionObjective objective : mission.getObjectives()) {
+            font.setColor(objective.isDone() ? Color.GREEN : Color.WHITE);
+            String prefix = objective.isDone() ? "[DONE] " : "[ ] ";
+            font.draw(batch, prefix + objective.getText(), 14f, objectiveY);
+            objectiveY -= 20f;
+        }
+        font.setColor(Color.WHITE);
         batch.end();
     }
 
