@@ -44,12 +44,13 @@ public class MainMenuScreen extends ScreenAdapter {
     private String[] menuOptions = {
         "Start Game",
         "Missions",
+        "Shop",
         "Settings",
         "Credits",
         "Exit"
     };
 
-    private Rectangle[] buttons = new Rectangle[5];
+    private Rectangle[] buttons = new Rectangle[6];
 
     private int hoveredButton = -1;
 
@@ -86,7 +87,7 @@ public class MainMenuScreen extends ScreenAdapter {
 
         for (int i = 0; i < buttons.length; i++) {
 
-            float buttonY = 350 - (i * 66);
+            float buttonY = 365 - (i * 57);
 
             buttons[i] = new Rectangle(
                 buttonX,
@@ -339,18 +340,22 @@ public class MainMenuScreen extends ScreenAdapter {
                 break;
 
             case 1:
-                Gdx.app.log("MainMenu", "Missions selected.");
+                game.setScreen(new MissionSelectScreen(game));
                 break;
 
             case 2:
-                Gdx.app.log("MainMenu", "Settings selected.");
+                game.setScreen(new ShopScreen(game));
                 break;
 
             case 3:
-                Gdx.app.log("MainMenu", "Credits selected.");
+                Gdx.app.log("MainMenu", "Settings selected.");
                 break;
 
             case 4:
+                Gdx.app.log("MainMenu", "Credits selected.");
+                break;
+
+            case 5:
                 Gdx.app.exit();
                 break;
         }

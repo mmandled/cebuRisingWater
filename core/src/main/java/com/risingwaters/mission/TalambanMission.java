@@ -51,12 +51,13 @@ public final class TalambanMission extends Mission {
     }
 
     public MissionResult makeResult(RescueController rescue, FloodSystem flood,
-            RescueBoat boat, int playerHealth, int repairKits) {
+            RescueBoat boat, int playerHealth, int repairKits,
+            int startingKits, int startingCleaners) {
         if (!isFinished()) throw new IllegalStateException("Mission is still active");
         int barriers = 0;
         for (FloodBarrier b : flood.getBarriers()) if (b.isPlaced()) barriers++;
-        int usedKits = Math.max(0, 2 - repairKits);
-        int usedCleaners = Math.max(0, 4 - flood.getCleaners());
+        int usedKits = Math.max(0, startingKits - repairKits);
+        int usedCleaners = Math.max(0, startingCleaners - flood.getCleaners());
         // The reward is based on what the player managed to save.
         int reward = getStatus() == Status.SUCCESS
                 ? 500 + Math.round(boat.getHealth()) * 2 + Math.max(0, playerHealth) * 75

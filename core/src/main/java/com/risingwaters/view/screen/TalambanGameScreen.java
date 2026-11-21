@@ -32,6 +32,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.risingwaters.CebuRisingWatersGame;
+import com.risingwaters.shop.Shop;
 import com.risingwaters.mission.Mission;
 import com.risingwaters.mission.MissionObjective;
 import com.risingwaters.mission.MissionResult;
@@ -72,7 +73,7 @@ public class TalambanGameScreen extends ScreenAdapter {
     private float collisionCooldown;
     private int playerHealth = 3;
     private float deepWaterTime;
-    private int repairKits = 2;
+    private int repairKits;
     private String healthMessage = "Stay in the boat when the water is deep.";
     private boolean drivingBoat;
     private boolean boatSummoned;
@@ -176,7 +177,11 @@ public class TalambanGameScreen extends ScreenAdapter {
 
     private void loadBoat() {
         // The player carries the boat. It appears after pressing B.
-        boat = new RescueBoat(0f, 0f, 2, 175f, 100f);
+        boat = new RescueBoat(0f, 0f,
+                2 + game.getShop().getLevel(Shop.BOAT_CAPACITY),
+                175f * (1f + 0.15f * game.getShop().getLevel(Shop.BOAT_SPEED)),
+                100f + 25f * game.getShop().getLevel(Shop.BOAT_HEALTH));
+        repairKits = 2 + game.getShop().getLevel(Shop.REPAIR_SUPPLIES);
         boatSummoned = false;
     }
 
@@ -222,7 +227,9 @@ public class TalambanGameScreen extends ScreenAdapter {
     }
 
     private void loadFloodCleanup() {
-        flood = new FloodSystem(mapWidth, mapHeight, rescue.getEvacuationZone());
+        flood = new FloodSystem(mapWidth, mapHeight, rescue.getEvacuationZone(),
+                4 + game.getShop().getLevel(Shop.CLEANUP_TOOLS),
+                3 + game.getShop().getLevel(Shop.BARRIER_SUPPLIES));
         MapLayer drains = map.getLayers().get("Drainage");
         MapLayer garbage = map.getLayers().get("Garbage");
         if (drains == null || garbage == null) {
@@ -234,7 +241,8 @@ public class TalambanGameScreen extends ScreenAdapter {
             boolean clogged = Boolean.TRUE.equals(obj.getProperties().get("clogged"));
             float time = number(obj, "cleaningTime", 5f);
             float reduction = number(obj, "floodReduction", 0.2f);
-            flood.addDrain(new Drainage(obj.getName(), x, y, clogged, time, reduction));
+            float faster = 1f + 0.20f * game.getShop().getLevel(Shop.CLEANUP_TOOLS);
+            flood.addDrain(new Drainage(obj.getName(), x, y, clogged, time / faster, reduction));
         }
         for (MapObject obj : garbage.getObjects()) {
             flood.addGarbage(new GarbagePile(obj.getName(), number(obj, "x", 0f), number(obj, "y", 0f)));
@@ -408,7 +416,9 @@ public class TalambanGameScreen extends ScreenAdapter {
         if (!mission.isFinished()) handleBoatControls(step);
         mission.update(step, rescue, flood, boat, playerHealth);
         if (mission.isFinished()) {
-            MissionResult result = mission.makeResult(rescue, flood, boat, playerHealth, repairKits);
+            MissionResult result = mission.makeResult(rescue, flood, boat, playerHealth, repairKits,
+                    2 + game.getShop().getLevel(Shop.REPAIR_SUPPLIES),
+                    4 + game.getShop().getLevel(Shop.CLEANUP_TOOLS));
             if (result.isSuccess()) game.awardTalambanOnce(result.getReward());
             game.setScreen(new MissionResultScreen(game, result));
             dispose();

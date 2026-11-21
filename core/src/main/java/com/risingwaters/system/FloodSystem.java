@@ -22,16 +22,23 @@ public final class FloodSystem {
     private final Array<FloodBarrier> barriers = new Array<>();
     private static final float BARRIER_RANGE = 118f;
     private static final float PROTECTION_RADIUS = 175f;
-    private int barrierSupplies = 3;
+    private int barrierSupplies;
     private String barrierMessage = "P: place a barrier near a marked spot.";
     private float depth = 1f;
     private float targetDepth = 1f;
-    private int cleaners = 4;
+    private int cleaners;
     private Drainage cleaningDrain;
     private float cleaningProgress;
     private String message = "Hold C near a drain, or press C near garbage.";
 
     public FloodSystem(float mapWidth, float mapHeight, Rectangle evacuation) {
+        this(mapWidth, mapHeight, evacuation, 4, 3);
+    }
+
+    public FloodSystem(float mapWidth, float mapHeight, Rectangle evacuation,
+            int startingCleaners, int startingBarriers) {
+        cleaners = Math.max(0, startingCleaners);
+        barrierSupplies = Math.max(0, startingBarriers);
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
         this.evacuation = new Rectangle(evacuation);

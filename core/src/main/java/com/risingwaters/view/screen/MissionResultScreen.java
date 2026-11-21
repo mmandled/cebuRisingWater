@@ -36,6 +36,12 @@ public final class MissionResultScreen extends ScreenAdapter {
             dispose();
             return;
         }
+        if (result.isSuccess() && (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)
+                || Gdx.input.isKeyJustPressed(Input.Keys.S))) {
+            game.setScreen(new ShopScreen(game));
+            dispose();
+            return;
+        }
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)
                 || Gdx.input.isKeyJustPressed(Input.Keys.ENTER)
                 || Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
@@ -73,7 +79,8 @@ public final class MissionResultScreen extends ScreenAdapter {
         font.setColor(Color.valueOf("F4DD92"));
         draw("Funds earned: " + result.getReward() + "   |   Total funds: " + game.getFunds(), 120, 150);
         font.setColor(Color.LIGHT_GRAY);
-        draw("ENTER: Menu (shop coming in Milestone 08)   R: Retry   ESC: Menu", 120, 103);
+        draw(result.isSuccess() ? "ENTER / S: Shop   R: Retry   ESC: Menu"
+                : "R: Retry   ENTER / ESC: Menu", 120, 103);
         batch.end();
     }
 
