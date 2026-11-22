@@ -46,7 +46,7 @@ public final class ShopScreen extends ScreenAdapter {
             viewport.unproject(click);
             if (click.x >= 90 && click.x <= 870) {
                 for (int i = 0; i < game.getShop().getUpgrades().size; i++) {
-                    float bottom = 440 - i * 59;
+                    float bottom = 440 - i * 53;
                     if (click.y >= bottom && click.y <= bottom + 49) game.buyUpgrade(i);
                 }
             }
@@ -60,7 +60,7 @@ public final class ShopScreen extends ScreenAdapter {
         shapes.rect(65, 45, 830, 520);
         for (int i = 0; i < game.getShop().getUpgrades().size; i++) {
             shapes.setColor(i % 2 == 0 ? Color.valueOf("244358") : Color.valueOf("1D384E"));
-            shapes.rect(90, 440 - i * 59, 780, 49);
+            shapes.rect(90, 440 - i * 53, 780, 49);
         }
         shapes.end();
         batch.setProjectionMatrix(camera.combined);
@@ -68,13 +68,13 @@ public final class ShopScreen extends ScreenAdapter {
         font.setColor(Color.valueOf("8DDFD5"));
         font.draw(batch, "RESPONSE EQUIPMENT SHOP", 92, 536);
         font.setColor(Color.WHITE);
-        font.draw(batch, "Funds: " + game.getFunds() + "   |   Click an upgrade or press 1-6", 92, 506);
+        font.draw(batch, "Funds: " + game.getFunds() + "   |   Click an upgrade or press 1-7", 92, 506);
         Shop shop = game.getShop();
         for (int i = 0; i < shop.getUpgrades().size; i++) {
             Shop.Upgrade upgrade = shop.getUpgrades().get(i);
             int level = shop.getLevel(i);
             int max = upgrade.getMaxLevel();
-            float top = 474 - i * 59;
+            float top = 474 - i * 53;
             font.setColor(Color.WHITE);
             font.draw(batch, (i + 1) + ". " + upgrade.getName() + "  Lv " + level + "/" + max, 105, top);
             font.setColor(Color.LIGHT_GRAY);

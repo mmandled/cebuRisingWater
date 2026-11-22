@@ -37,6 +37,10 @@ import com.risingwaters.mission.Mission;
 import com.risingwaters.mission.MissionObjective;
 import com.risingwaters.mission.MissionResult;
 import com.risingwaters.mission.TalambanMission;
+import com.risingwaters.ability.MoraleBoost;
+import com.risingwaters.event.FlashFloodEvent;
+import com.risingwaters.controller.VolunteerController;
+import com.risingwaters.model.Volunteer;
 
 // Talamban gameplay screen. The player and boat are placeholders for now.
 public class TalambanGameScreen extends ScreenAdapter {
@@ -82,6 +86,10 @@ public class TalambanGameScreen extends ScreenAdapter {
     private boolean drivingBoat;
     private boolean boatSummoned;
     private TalambanMission mission;
+    private final MoraleBoost moraleBoost = new MoraleBoost();
+    private final FlashFloodEvent flashFlood = new FlashFloodEvent();
+    private VolunteerController volunteers;
+    private String abilityMessage = "M: Morale Boost (boat) | V: volunteer cleanup after rescues.";
     private boolean cleaningLockedMessageShown;
     private float waterDamageCooldown;
     private String boatMessage = "Press B at the evacuation gate to launch your rescue boat.";
@@ -108,6 +116,7 @@ public class TalambanGameScreen extends ScreenAdapter {
         loadBoat();
         loadFloodCleanup();
         mission = new TalambanMission(rescue, flood);
+        volunteers = new VolunteerController(game.getShop().getLevel(Shop.VOLUNTEERS), flood);
         // Start at the safe playground so the boat is available right away.
         movePlayerToSafeStart();
         hudCamera = new OrthographicCamera();
@@ -287,6 +296,15 @@ public class TalambanGameScreen extends ScreenAdapter {
         for (MapObject obj : garbage.getObjects()) {
             flood.addGarbage(new GarbagePile(obj.getName(), number(obj, "x", 0f), number(obj, "y", 0f)));
         }
+        // These are the places with deeper water.
+        MapLayer heavyLayer = map.getLayers().get("HeavyFloodZones");
+        if (heavyLayer != null) {
+            for (MapObject obj : heavyLayer.getObjects()) {
+                if (obj instanceof RectangleMapObject) {
+                    flood.addHeavyZone(((RectangleMapObject) obj).getRectangle());
+                }
+            }
+        }
         MapLayer barrierLayer = map.getLayers().get("BarrierSpots");
         if (barrierLayer != null) {
             for (MapObject obj : barrierLayer.getObjects()) {
@@ -355,11 +373,12 @@ public class TalambanGameScreen extends ScreenAdapter {
             if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) input.x++;
             if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) input.y++;
             if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) input.y--;
-            if (input.len2() > 0) input.nor().scl(boat.getSpeed());
+            if (input.len2() > 0) input.nor().scl(boat.getSpeed() * moraleBoost.getSpeedMultiplier());
             flood.currentAt(boat.getPosition().x, boat.getPosition().y, current);
             // The current is weaker near the evacuation gate.
             if (closeToDock(boat.getPosition().x, boat.getPosition().y)) current.scl(0.18f);
             if (Gdx.input.isKeyPressed(Input.Keys.C)) current.scl(0.10f);
+            if (moraleBoost.isActive()) current.scl(0.75f);
             boolean hit = boat.sail((input.x + current.x) * delta,
                     (input.y + current.y) * delta, flood, walls);
             if (hit && current.len() >= 30f
@@ -421,6 +440,17 @@ public class TalambanGameScreen extends ScreenAdapter {
             healthMessage = "Boat repaired (+35 HP).";
         }
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
+            if (!drivingBoat) abilityMessage = "Board the boat before using Morale Boost.";
+            else if (moraleBoost.activate()) abilityMessage = "Morale Boost activated!";
+            else abilityMessage = "Morale Boost recharging.";
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.V)) {
+            float x = drivingBoat ? boat.getPosition().x : centerX();
+            float y = drivingBoat ? boat.getPosition().y : centerY();
+            volunteers.assign(x, y, rescue.isComplete());
+        }
+
         // Finish all rescues before the drains and garbage can be cleaned.
         boolean cleaning = Gdx.input.isKeyPressed(Input.Keys.C);
         if (rescue.isComplete()) {
@@ -433,6 +463,8 @@ public class TalambanGameScreen extends ScreenAdapter {
                         + "/" + rescue.getCivilianCount() + ").");
             }
         }
+        volunteers.update(delta);
+        moraleBoost.update(delta);
         flood.update(delta);
         rescue.setAllowWalkingForAll(flood.getDepth() <= FloodSystem.WALKABLE_DEPTH);
         collisionCooldown = Math.max(0f, collisionCooldown - delta);
@@ -459,13 +491,16 @@ public class TalambanGameScreen extends ScreenAdapter {
             return;
         }
         float step = Math.min(delta, 1f / 30f);
+        // The surge changes water behavior but does not reset cleanup progress.
+        flashFlood.update(step, !rescue.isComplete() && flood.getDepth() > 0.4f);
+        flood.setSurgeBonus(flashFlood.getSurgeAmount());
         if (!mission.isFinished()) handleBoatControls(step);
         mission.update(step, rescue, flood, boat, playerHealth);
         if (mission.isFinished()) {
             MissionResult result = mission.makeResult(rescue, flood, boat, playerHealth, repairKits,
                     2 + game.getShop().getLevel(Shop.REPAIR_SUPPLIES),
                     4 + game.getShop().getLevel(Shop.CLEANUP_TOOLS));
-            if (result.isSuccess()) game.awardTalambanOnce(result.getReward());
+            if (result.isSuccess()) game.awardTalambanCompletion(result.getReward());
             game.setScreen(new MissionResultScreen(game, result));
             dispose();
             return;
@@ -519,6 +554,7 @@ public class TalambanGameScreen extends ScreenAdapter {
         shapes.end();
 
         drawCleanupMarkers();
+        drawVolunteerMarkers();
 
         if (floodDebug) {
             shapes.begin(ShapeRenderer.ShapeType.Line);
@@ -527,6 +563,8 @@ public class TalambanGameScreen extends ScreenAdapter {
             Rectangle safe = flood.getEvacuation();
             shapes.setColor(Color.GREEN);
             shapes.rect(safe.x, safe.y, safe.width, safe.height);
+            shapes.setColor(Color.MAGENTA);
+            for (Rectangle zone : flood.getHeavyZones()) shapes.rect(zone.x, zone.y, zone.width, zone.height);
             shapes.end();
         }
         if (collisionDebug) {
@@ -558,14 +596,19 @@ public class TalambanGameScreen extends ScreenAdapter {
         font.draw(batch, flood.getMessage() + "  |  Cyan grates = drains, orange circles = garbage", 14f, top - 110f);
         font.draw(batch, flood.getBarrierMessage(), 14f, top - 132f);
         font.draw(batch, boatMessage, 14f, top - 154f);
+        font.setColor(flashFlood.isActive() ? Color.SCARLET : Color.WHITE);
+        font.draw(batch, flashFlood.getMessage() + " | " + abilityMessage, 14f, top - 176f);
+        font.setColor(Color.WHITE);
+        font.draw(batch, "Boost: " + (moraleBoost.isActive() ? "ACTIVE" : (int)moraleBoost.getCooldown() + "s cooldown")
+                + " | Volunteers: " + volunteers.getVolunteers().size + " | " + volunteers.getMessage(), 14f, top - 198f);
         if (flood.allClean() && flood.getDepth() <= 0.01f) {
-            font.draw(batch, "All drains and garbage cleared! Flood gone.", 14f, top - 176f);
+            font.draw(batch, "All drains and garbage cleared! Flood gone.", 14f, top - 220f);
         }
         if (drivingBoat && boat.getPassengerCount() > 0) {
-            font.draw(batch, "Passengers aboard: dock at the evacuation gate, then press U.", 14f, top - 198f);
+            font.draw(batch, "Passengers aboard: dock at the evacuation gate, then press U.", 14f, top - 240f);
         }
         // Mission progress stays visible while playing.
-        float objectiveY = top - 226f;
+        float objectiveY = top - 268f;
         for (MissionObjective objective : mission.getObjectives()) {
             font.setColor(objective.isDone() ? Color.GREEN : Color.WHITE);
             String prefix = objective.isDone() ? "[DONE] " : "[ ] ";
@@ -605,6 +648,17 @@ public class TalambanGameScreen extends ScreenAdapter {
         shapes.end();
     }
 
+    private void drawVolunteerMarkers() {
+        shapes.setProjectionMatrix(camera.combined);
+        shapes.begin(ShapeRenderer.ShapeType.Filled);
+        for (Volunteer helper : volunteers.getVolunteers()) {
+            if (!helper.isBusy()) continue;
+            shapes.setColor(Color.LIME);
+            shapes.circle(helper.getPosition().x, helper.getPosition().y, 11f);
+        }
+        shapes.end();
+    }
+
     private void drawFlood() {
         float depth = flood.getDepth();
         if (depth <= 0.005f) return;
@@ -623,6 +677,8 @@ public class TalambanGameScreen extends ScreenAdapter {
         shapes.rect(0f, 0f, mapWidth, bottom);
         shapes.rect(0f, bottom, left, top - bottom);
         shapes.rect(right, bottom, mapWidth-right, top-bottom);
+        shapes.setColor(0.05f, 0.24f, 0.60f, 0.08f * depth);
+        for (Rectangle zone : flood.getHeavyZones()) shapes.rect(zone.x, zone.y, zone.width, zone.height);
         shapes.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
     }
@@ -634,7 +690,7 @@ public class TalambanGameScreen extends ScreenAdapter {
         if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) input.y++;
         if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) input.y--;
         // Walking in deep water is slower than on dry ground.
-        float walkingSpeed = flood.isWet(centerX(), centerY()) ? SPEED * 0.65f : SPEED;
+        float walkingSpeed = flood.isWet(centerX(), centerY()) ? SPEED * (flood.getLocalDepth(centerX(), centerY()) >= 1.1f ? 0.45f : 0.65f) : SPEED;
         if (input.len2() > 0) input.nor().scl(walkingSpeed * delta);
         moveAxis(input.x, true);
         moveAxis(input.y, false);

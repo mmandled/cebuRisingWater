@@ -14,6 +14,8 @@ public final class FloodSystem {
     public static final float BOAT_DEPTH = 0.18f;
     public static final float WALKABLE_DEPTH = 0.20f;
     private static final float CLEANUP_RANGE = 90f;
+    private final Array<Rectangle> heavyZones = new Array<>();
+    private float surgeBonus;
     private final float mapWidth;
     private final float mapHeight;
     private final Rectangle evacuation;
@@ -42,6 +44,18 @@ public final class FloodSystem {
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
         this.evacuation = new Rectangle(evacuation);
+    }
+
+    public void addHeavyZone(Rectangle zone) { heavyZones.add(new Rectangle(zone)); }
+    public Array<Rectangle> getHeavyZones() { return heavyZones; }
+    public void setSurgeBonus(float bonus) { surgeBonus = Math.max(0f, bonus); }
+    public float getLocalDepth(float x, float y) {
+        if (!insideMap(x, y) || evacuation.contains(x, y)) return 0f;
+        float extra = surgeBonus;
+        for (Rectangle zone : heavyZones) {
+            if (zone.contains(x, y)) { extra += 0.25f; break; }
+        }
+        return Math.min(1.35f, depth * (1f + extra));
     }
 
     public void addDrain(Drainage drain) { drains.add(drain); }
@@ -98,11 +112,11 @@ public final class FloodSystem {
     }
 
     public boolean isWet(float x, float y) {
-        return insideMap(x, y) && !evacuation.contains(x, y) && depth > BOAT_DEPTH;
+        return getLocalDepth(x, y) > BOAT_DEPTH;
     }
 
     public boolean canBoatOccupy(float x, float y, float radius) {
-        if (depth <= BOAT_DEPTH) return false;
+        if (getLocalDepth(x, y) <= BOAT_DEPTH) return false;
         Rectangle hitbox = new Rectangle(x-radius, y-radius, radius*2f, radius*2f);
         return hitbox.x >= 0 && hitbox.y >= 0 && hitbox.x + hitbox.width <= mapWidth
             && hitbox.y + hitbox.height <= mapHeight && !hitbox.overlaps(evacuation);
@@ -115,7 +129,7 @@ public final class FloodSystem {
         float direction = lane % 2 == 0 ? -1f : 1f;
         float vertical = (float)Math.sin(x / 290f + lane) * 0.32f;
         float strength = isProtected(x, y) ? 0.25f : 1f;
-        return out.set(direction, vertical).nor().scl(36f * depth * strength);
+        return out.set(direction, vertical).nor().scl(36f * getLocalDepth(x, y) * strength);
     }
 
     public void update(float delta) {
@@ -166,6 +180,13 @@ public final class FloodSystem {
             cancelCleaning();
             updateTarget();
         }
+    }
+
+    public void finishVolunteerCleanup(CleanupTarget target) {
+        if (target.isCleared()) return;
+        target.clear();
+        message = target.getId() + " cleared by volunteer!";
+        updateTarget();
     }
 
     private void updateTarget() {

@@ -36,14 +36,16 @@ public class CebuRisingWatersGame extends Game {
         return true;
     }
 
-    public void awardTalambanOnce(int amount) {
-        if (talambanRewardClaimed) return;
+
+    public void awardTalambanCompletion(int amount) {
         funds += Math.max(0, amount);
         talambanRewardClaimed = true;
+
         save.putInteger("funds", funds);
         save.putBoolean("talambanRewardClaimed", true);
         save.flush();
     }
+
 
     @Override
     public void dispose() {

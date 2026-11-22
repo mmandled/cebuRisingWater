@@ -10,6 +10,7 @@ public final class Shop {
     public static final int CLEANUP_TOOLS = 3;
     public static final int REPAIR_SUPPLIES = 4;
     public static final int BARRIER_SUPPLIES = 5;
+    public static final int VOLUNTEERS = 6;
 
     private final Preferences save;
     private final Array<Upgrade> upgrades = new Array<>();
@@ -23,6 +24,7 @@ public final class Shop {
         upgrades.add(new Upgrade("Cleanup tools", "Faster drains and one extra cleaner", 200, 3));
         upgrades.add(new Upgrade("Repair supplies", "One extra repair kit each mission", 180, 2));
         upgrades.add(new Upgrade("Barrier supplies", "One extra barrier each mission", 180, 2));
+        upgrades.add(new Upgrade("Volunteers", "One helper to clear drainage or garbage", 400, 3));
     }
 
     public Array<Upgrade> getUpgrades() { return upgrades; }
