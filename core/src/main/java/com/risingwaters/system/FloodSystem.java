@@ -115,7 +115,7 @@ public final class FloodSystem {
         float direction = lane % 2 == 0 ? -1f : 1f;
         float vertical = (float)Math.sin(x / 290f + lane) * 0.32f;
         float strength = isProtected(x, y) ? 0.25f : 1f;
-        return out.set(direction, vertical).nor().scl(75f * depth * strength);
+        return out.set(direction, vertical).nor().scl(36f * depth * strength);
     }
 
     public void update(float delta) {

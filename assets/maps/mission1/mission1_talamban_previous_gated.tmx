@@ -1,0 +1,169 @@
+<?xml version='1.0' encoding='utf-8'?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="40" height="24" tilewidth="48" tileheight="48" infinite="0" nextlayerid="13" nextobjectid="150">
+  <imagelayer id="1" name="CityBackground">
+    <image source="mission1_talamban_city.png" width="1920" height="1152" />
+  </imagelayer>
+  <objectgroup id="2" name="BuildingCollisions">
+    <object id="1" name="northwest_offices" x="94.87" y="88.98" width="266.83" height="164.91" />
+    <object id="2" name="north_residence_a" x="504.01" y="65.25" width="118.59" height="106.78" />
+    <object id="3" name="north_residence_b" x="654.63" y="53.39" width="103.17" height="116.27" />
+    <object id="4" name="north_residence_c" x="786.26" y="58.13" width="105.55" height="115.08" />
+    <object id="5" name="northeast_house_a" x="1114.76" y="118.64" width="132.82" height="83.05" />
+    <object id="6" name="northeast_house_b" x="1357.88" y="14.24" width="94.87" height="100.84" />
+    <object id="7" name="northeast_house_c" x="1470.54" y="11.86" width="107.92" height="106.78" />
+    <object id="8" name="northeast_residence" x="1350.76" y="225.42" width="222.95" height="96.10" />
+    <object id="9" name="east_top_house" x="1665.03" y="228.98" width="135.19" height="93.73" />
+    <object id="10" name="market_block" x="527.73" y="242.03" width="379.49" height="97.29" />
+    <object id="11" name="west_house" x="142.31" y="427.11" width="139.94" height="106.78" />
+    <object id="12" name="central_homes" x="501.64" y="433.04" width="251.41" height="185.08" />
+    <object id="13" name="central_office" x="773.22" y="417.61" width="123.34" height="201.69" />
+    <object id="14" name="east_office" x="1338.90" y="539.81" width="231.25" height="132.88" />
+    <object id="15" name="east_homes" x="1523.90" y="410.50" width="189.75" height="111.52" />
+    <object id="16" name="lower_center_home_a" x="664.11" y="698.79" width="87.76" height="112.71" />
+    <object id="17" name="lower_center_home_b" x="772.03" y="697.61" width="116.22" height="117.45" />
+    <object id="18" name="lower_center_home_c" x="678.34" y="872.01" width="112.66" height="172.03" />
+    <object id="19" name="lower_center_home_d" x="804.05" y="882.69" width="98.43" height="154.23" />
+    <object id="20" name="lower_mid_home_a" x="1053.09" y="708.28" width="124.52" height="129.32" />
+    <object id="21" name="lower_mid_home_b" x="1261.82" y="721.33" width="125.71" height="110.34" />
+    <object id="22" name="lower_mid_home_c" x="1060.21" y="886.25" width="104.36" height="148.30" />
+    <object id="23" name="lower_mid_home_d" x="1252.33" y="883.87" width="136.38" height="157.79" />
+    <object id="24" name="lower_east_house_a" x="1430.22" y="721.33" width="118.59" height="124.57" />
+    <object id="25" name="lower_east_house_b" x="1568.97" y="727.27" width="125.71" height="103.22" />
+    <object id="26" name="lower_east_house_c" x="1494.26" y="898.11" width="123.34" height="137.62" />
+    <object id="27" name="lower_east_house_d" x="1642.50" y="901.67" width="154.17" height="142.37" />
+    <object id="28" name="far_east_house" x="1767.02" y="580.15" width="138.75" height="107.96" />
+    <object id="29" name="far_east_office" x="1768.20" y="854.21" width="132.82" height="128.13" />
+    <object id="30" name="evac_building" x="249.04" y="809.13" width="258.53" height="122.20" />
+    <object id="31" name="evac_tents_left" x="254.97" y="930.14" width="109.10" height="98.47" />
+    <object id="32" name="evac_tents_right" x="426.93" y="932.51" width="107.92" height="98.47" />
+    <object id="33" name="evac_play_court" x="104.36" y="911.16" width="98.43" height="85.42" />
+  </objectgroup>
+  <objectgroup id="3" name="EvacuationFence">
+    <object id="34" name="left_fence" x="58.11" y="861.33" width="16.60" height="230.16" />
+    <object id="35" name="right_fence" x="559.75" y="825.74" width="18.97" height="272.87" />
+    <object id="36" name="south_fence_left" x="66.41" y="1078.44" width="272.76" height="22.54" />
+    <object id="37" name="south_fence_right" x="409.14" y="1078.44" width="154.17" height="22.54" />
+    <object id="38" name="north_fence_left" x="59.30" y="828.11" width="189.75" height="17.80" />
+    <object id="39" name="north_fence_right" x="504.01" y="829.30" width="71.16" height="18.98" />
+  </objectgroup>
+  <objectgroup id="4" name="EvacuationGate">
+    <object id="41" name="evacuation_gate" x="340.36" y="1026.24" width="68.78" height="102.03" />
+  </objectgroup>
+  <objectgroup id="5" name="BoatUnloadZone">
+    <object id="42" name="boat_unload" x="340.36" y="1106.92" width="69.97" height="39.15" />
+  </objectgroup>
+  <objectgroup id="6" name="PlayerSpawn">
+    <object id="43" name="player-start" x="377.12" y="1052.34">
+      <point />
+    </object>
+  </objectgroup>
+  <objectgroup id="7" name="BoatSpawn">
+    <object id="44" name="boat_start" x="374.75" y="1128.27">
+      <point />
+    </object>
+  </objectgroup>
+  <objectgroup id="8" name="Civilians">
+    <object id="45" name="civilian_01" x="419.81" y="373.72">
+      <point />
+      <properties>
+        <property name="rescued" type="bool" value="false" />
+        <property name="requiresBoat" type="bool" value="true" />
+      </properties>
+    </object>
+    <object id="46" name="civilian_02" x="967.71" y="379.65">
+      <point />
+      <properties>
+        <property name="rescued" type="bool" value="false" />
+        <property name="requiresBoat" type="bool" value="true" />
+      </properties>
+    </object>
+    <object id="47" name="civilian_03" x="1314.00" y="380.84">
+      <point />
+      <properties>
+        <property name="rescued" type="bool" value="false" />
+        <property name="requiresBoat" type="bool" value="true" />
+      </properties>
+    </object>
+    <object id="48" name="civilian_04" x="1800.22" y="376.09">
+      <point />
+      <properties>
+        <property name="rescued" type="bool" value="false" />
+        <property name="requiresBoat" type="bool" value="true" />
+      </properties>
+    </object>
+    <object id="49" name="civilian_05" x="1281.98" y="678.62">
+      <point />
+      <properties>
+        <property name="rescued" type="bool" value="false" />
+        <property name="requiresBoat" type="bool" value="true" />
+      </properties>
+    </object>
+    <object id="50" name="civilian_06" x="925.02" y="685.74">
+      <point />
+      <properties>
+        <property name="rescued" type="bool" value="false" />
+        <property name="requiresBoat" type="bool" value="true" />
+      </properties>
+    </object>
+    <object id="51" name="civilian_07" x="1419.54" y="863.70">
+      <point />
+      <properties>
+        <property name="rescued" type="bool" value="false" />
+        <property name="requiresBoat" type="bool" value="true" />
+      </properties>
+    </object>
+    <object id="52" name="civilian_08" x="622.61" y="1095.05">
+      <point />
+      <properties>
+        <property name="rescued" type="bool" value="false" />
+        <property name="requiresBoat" type="bool" value="true" />
+      </properties>
+    </object>
+  </objectgroup>
+  <objectgroup id="9" name="EvacuationZone">
+    <object id="40" name="evacuation_01" x="75.90" y="837.60" width="481.48" height="256.26" />
+  </objectgroup>
+  <objectgroup id="10" name="Garbage">
+    <object id="53" name="garbage_01" x="424.56" y="569.47">
+      <point />
+    </object>
+    <object id="54" name="garbage_02" x="954.66" y="599.13">
+      <point />
+    </object>
+    <object id="55" name="garbage_03" x="1405.31" y="696.42">
+      <point />
+    </object>
+    <object id="56" name="garbage_04" x="1790.74" y="753.37">
+      <point />
+    </object>
+  </objectgroup>
+  <objectgroup id="11" name="Drainage">
+    <object id="57" name="drain_01" x="436.42" y="392.70">
+      <point />
+      <properties>
+        <property name="clogged" type="bool" value="true" />
+        <property name="cleaningTime" type="float" value="5.0" />
+        <property name="floodReduction" type="float" value="0.2" />
+      </properties>
+    </object>
+    <object id="58" name="drain_02" x="1346.02" y="688.12">
+      <point />
+      <properties>
+        <property name="clogged" type="bool" value="true" />
+        <property name="cleaningTime" type="float" value="5.0" />
+        <property name="floodReduction" type="float" value="0.2" />
+      </properties>
+    </object>
+  </objectgroup>
+  <objectgroup id="12" name="BarrierSpots">
+    <object id="59" name="barrier_01" x="480.30" y="682.18">
+      <point />
+    </object>
+    <object id="60" name="barrier_02" x="1005.66" y="694.05">
+      <point />
+    </object>
+    <object id="61" name="barrier_03" x="1737.37" y="541.00">
+      <point />
+    </object>
+  </objectgroup>
+</map>

@@ -56,8 +56,12 @@ public class TalambanGameScreen extends ScreenAdapter {
     private BitmapFont font;
     private float mapWidth;
     private float mapHeight;
+    private float safeSpawnX;
+    private float safeSpawnY;
     private final Rectangle player = new Rectangle();
     private final Array<Rectangle> walls = new Array<>();
+    private final Rectangle evacuationGate = new Rectangle();
+    private final Rectangle unloadZone = new Rectangle();
     private final Vector2 input = new Vector2();
     private boolean collisionDebug = false;
     private boolean floodDebug = false;
@@ -80,7 +84,7 @@ public class TalambanGameScreen extends ScreenAdapter {
     private TalambanMission mission;
     private boolean cleaningLockedMessageShown;
     private float waterDamageCooldown;
-    private String boatMessage = "Press B in the playground to launch your rescue boat.";
+    private String boatMessage = "Press B at the evacuation gate to launch your rescue boat.";
 
 
     public TalambanGameScreen(CebuRisingWatersGame game) {
@@ -98,6 +102,7 @@ public class TalambanGameScreen extends ScreenAdapter {
         font = new BitmapFont();
 
         loadBuildingCollisions();
+        loadGateAreas();
         loadPlayerSpawn();
         loadRescueObjects();
         loadBoat();
@@ -132,6 +137,29 @@ public class TalambanGameScreen extends ScreenAdapter {
         }
     }
 
+    private Rectangle readZone(String layerName) {
+        MapLayer layer = map.getLayers().get(layerName);
+        if (layer == null) throw new IllegalStateException(layerName + " layer missing");
+        for (MapObject object : layer.getObjects()) {
+            if (object instanceof RectangleMapObject) {
+                return new Rectangle(((RectangleMapObject)object).getRectangle());
+            }
+        }
+        throw new IllegalStateException(layerName + " needs a rectangle");
+    }
+
+    private void loadGateAreas() {
+        evacuationGate.set(readZone("EvacuationGate"));
+        unloadZone.set(readZone("BoatUnloadZone"));
+        MapLayer fences = map.getLayers().get("EvacuationFence");
+        if (fences == null) throw new IllegalStateException("EvacuationFence missing");
+        for (MapObject object : fences.getObjects()) {
+            if (object instanceof RectangleMapObject) {
+                walls.add(new Rectangle(((RectangleMapObject)object).getRectangle()));
+            }
+        }
+    }
+
     private void loadPlayerSpawn() {
         // LibGDX already flips Tiled's Y coordinates when loading the map.
         MapLayer layer = map.getLayers().get("PlayerSpawn");
@@ -145,6 +173,8 @@ public class TalambanGameScreen extends ScreenAdapter {
         player.set(x - PLAYER_SIZE / 2f, y - PLAYER_SIZE / 2f, PLAYER_SIZE, PLAYER_SIZE);
         player.x = MathUtils.clamp(player.x, 0, mapWidth - player.width);
         player.y = MathUtils.clamp(player.y, 0, mapHeight - player.height);
+        safeSpawnX = player.x;
+        safeSpawnY = player.y;
     }
 
     private void loadRescueObjects() {
@@ -186,22 +216,32 @@ public class TalambanGameScreen extends ScreenAdapter {
     }
 
     private void movePlayerToSafeStart() {
-        Rectangle safe = rescue.getEvacuationZone();
-        float x = safe.x + safe.width * 0.76f;
-        float y = safe.y + safe.height * 0.50f;
-        player.setPosition(x - PLAYER_SIZE / 2f, y - PLAYER_SIZE / 2f);
+        // Use the spawn we placed in Tiled.
+        player.setPosition(safeSpawnX, safeSpawnY);
     }
 
     private boolean closeToDock(float x, float y) {
-        Rectangle safe = rescue.getEvacuationZone();
-        float nearestX = MathUtils.clamp(x, safe.x, safe.x + safe.width);
-        float nearestY = MathUtils.clamp(y, safe.y, safe.y + safe.height);
-        float dx = x - nearestX;
-        float dy = y - nearestY;
-        return dx * dx + dy * dy <= DOCK_RANGE * DOCK_RANGE;
+        // Passengers can only be unloaded at the gate.
+        return unloadZone.contains(x, y);
     }
 
     private boolean findBoatLaunch() {
+        // Try the shoreline spawn from Tiled first.
+        MapLayer spawnLayer = map.getLayers().get("BoatSpawn");
+        if (spawnLayer != null) {
+            for (MapObject object : spawnLayer.getObjects()) {
+                float x = number(object, "x", -100f);
+                float y = number(object, "y", -100f);
+                if (!flood.canBoatOccupy(x, y, 18f)) continue;
+                Rectangle hitbox = new Rectangle(x - 18f, y - 18f, 36f, 36f);
+                boolean blocked = false;
+                for (Rectangle wall : walls) if (wall.overlaps(hitbox)) { blocked = true; break; }
+                if (!blocked) {
+                    boat.getPosition().set(x, y);
+                    return true;
+                }
+            }
+        }
         Rectangle safe = rescue.getEvacuationZone();
         float right = safe.x + safe.width;
         float top = safe.y + safe.height;
@@ -270,7 +310,7 @@ public class TalambanGameScreen extends ScreenAdapter {
     private void toggleBoat() {
         if (drivingBoat) {
             if (!closeToDock(boat.getPosition().x, boat.getPosition().y)) {
-                boatMessage = "Return near the playground to leave the boat.";
+                boatMessage = "Bring the boat to the evacuation gate to disembark.";
                 return;
             }
             // Store the boat again when getting off at the playground.
@@ -280,8 +320,8 @@ public class TalambanGameScreen extends ScreenAdapter {
             boatMessage = "Boat stored. Press B to launch it again.";
             return;
         }
-        if (!rescue.isInEvacuationZone(centerX(), centerY())) {
-            boatMessage = "Go to the evacuation playground to launch the boat.";
+        if (!evacuationGate.contains(centerX(), centerY())) {
+            boatMessage = "Go to the evacuation gate to launch the boat.";
             return;
         }
         if (rescue.isEscorting()) {
@@ -297,13 +337,13 @@ public class TalambanGameScreen extends ScreenAdapter {
             return;
         }
         if (!findBoatLaunch()) {
-            boatMessage = "No free space beside the playground for the boat.";
+            boatMessage = "No clear launch space outside the gate.";
             return;
         }
         boatSummoned = true;
         drivingBoat = true;
         player.setPosition(boat.getPosition().x - PLAYER_SIZE/2f, boat.getPosition().y - PLAYER_SIZE/2f);
-        boatMessage = "Boat launched. Pick up civilians with E, unload at the playground with U.";
+        boatMessage = "Boat launched. Pick up civilians with E, unload at the gate with U.";
     }
 
     private void handleBoatControls(float delta) {
@@ -317,7 +357,7 @@ public class TalambanGameScreen extends ScreenAdapter {
             if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) input.y--;
             if (input.len2() > 0) input.nor().scl(boat.getSpeed());
             flood.currentAt(boat.getPosition().x, boat.getPosition().y, current);
-            // The water is calmer beside the evacuation playground.
+            // The current is weaker near the evacuation gate.
             if (closeToDock(boat.getPosition().x, boat.getPosition().y)) current.scl(0.18f);
             if (Gdx.input.isKeyPressed(Input.Keys.C)) current.scl(0.10f);
             boolean hit = boat.sail((input.x + current.x) * delta,
@@ -358,12 +398,12 @@ public class TalambanGameScreen extends ScreenAdapter {
             if (!drivingBoat) {
                 boatMessage = "Board the rescue boat first (B).";
             } else if (!closeToDock(boat.getPosition().x, boat.getPosition().y)) {
-                boatMessage = "Move near the playground border before unloading.";
+                boatMessage = "Dock at the evacuation gate to unload passengers.";
             } else if (boat.getPassengerCount() == 0) {
                 boatMessage = "There are no passengers to unload.";
             } else {
                 int delivered = rescue.evacuateBoatPassengers(boat);
-                boatMessage = delivered + " civilians evacuated at the playground!";
+                boatMessage = delivered + " civilians evacuated at the center!";
             }
         }
         if (!drivingBoat) rescue.update(centerX(), centerY());
@@ -407,6 +447,12 @@ public class TalambanGameScreen extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+            // Start the mission again from the beginning.
+            game.setScreen(new TalambanGameScreen(game));
+            dispose();
+            return;
+        }
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             game.setScreen(new MainMenuScreen(game));
             dispose();
@@ -472,6 +518,8 @@ public class TalambanGameScreen extends ScreenAdapter {
         }
         shapes.end();
 
+        drawCleanupMarkers();
+
         if (floodDebug) {
             shapes.begin(ShapeRenderer.ShapeType.Line);
             shapes.setColor(Color.CYAN);
@@ -495,7 +543,7 @@ public class TalambanGameScreen extends ScreenAdapter {
         batch.begin();
         font.setColor(Color.WHITE);
         float top = Gdx.graphics.getHeight() - 18f;
-        font.draw(batch, "MISSION 1: TALAMBAN | B Launch/Store | E Rescue | U Dock & Unload | C Clean | P Barrier | H Repair | ESC", 14f, top);
+        font.draw(batch, "MISSION 1: TALAMBAN | B Boat | E Rescue | U Unload | C Clean | P Barrier | H Repair | R Retry | ESC Menu", 14f, top);
         font.draw(batch, "Evacuated: " + rescue.getEvacuatedCount() + "/" + rescue.getCivilianCount()
             + "  |  " + (rescue.isComplete() ? "All civilians safe!" : rescue.getMessage()), 14f, top - 22f);
         font.draw(batch, "Boat HP " + (int)boat.getHealth() + "/" + (int)boat.getMaxHealth()
@@ -507,14 +555,14 @@ public class TalambanGameScreen extends ScreenAdapter {
                 + " | Flood: " + (int)(flood.getDepth() * 100f) + "% | Cleanup: "
                 + flood.getFinishedTasks() + "/" + flood.getTotalTasks()
                 + " | Garbage cleaners: " + flood.getCleaners(), 14f, top - 88f);
-        font.draw(batch, flood.getMessage(), 14f, top - 110f);
+        font.draw(batch, flood.getMessage() + "  |  Cyan grates = drains, orange circles = garbage", 14f, top - 110f);
         font.draw(batch, flood.getBarrierMessage(), 14f, top - 132f);
         font.draw(batch, boatMessage, 14f, top - 154f);
         if (flood.allClean() && flood.getDepth() <= 0.01f) {
             font.draw(batch, "All drains and garbage cleared! Flood gone.", 14f, top - 176f);
         }
         if (drivingBoat && boat.getPassengerCount() > 0) {
-            font.draw(batch, "Passengers aboard: return near the playground, then press U.", 14f, top - 198f);
+            font.draw(batch, "Passengers aboard: dock at the evacuation gate, then press U.", 14f, top - 198f);
         }
         // Mission progress stays visible while playing.
         float objectiveY = top - 226f;
@@ -526,6 +574,35 @@ public class TalambanGameScreen extends ScreenAdapter {
         }
         font.setColor(Color.WHITE);
         batch.end();
+    }
+
+    private void drawCleanupMarkers() {
+        // Draw the cleanup spots so they are easy to find.
+        shapes.setProjectionMatrix(camera.combined);
+        shapes.begin(ShapeRenderer.ShapeType.Filled);
+        for (Drainage drain : flood.getDrains()) {
+            float x = drain.getPosition().x;
+            float y = drain.getPosition().y;
+            shapes.setColor(drain.isCleared() ? Color.FOREST : Color.CYAN);
+            shapes.rect(x - 22f, y - 17f, 44f, 34f);
+            shapes.setColor(Color.DARK_GRAY);
+            shapes.rect(x - 17f, y - 12f, 34f, 24f);
+            shapes.setColor(drain.isCleared() ? Color.GREEN : Color.LIGHT_GRAY);
+            for (int i = -12; i <= 12; i += 8) {
+                shapes.rect(x + i - 2f, y - 9f, 4f, 18f);
+            }
+        }
+        for (GarbagePile pile : flood.getGarbage()) {
+            float x = pile.getPosition().x;
+            float y = pile.getPosition().y;
+            shapes.setColor(pile.isCleared() ? Color.GREEN : Color.ORANGE);
+            shapes.circle(x, y, 17f);
+            shapes.setColor(Color.DARK_GRAY);
+            shapes.rect(x - 9f, y - 7f, 18f, 14f);
+            shapes.setColor(pile.isCleared() ? Color.GREEN : Color.LIGHT_GRAY);
+            shapes.rect(x - 4f, y + 7f, 8f, 3f);
+        }
+        shapes.end();
     }
 
     private void drawFlood() {
@@ -565,8 +642,17 @@ public class TalambanGameScreen extends ScreenAdapter {
 
     private void moveAxis(float amount, boolean xAxis) {
         if (amount == 0f) return;
+        float oldX = player.x;
+        float oldY = player.y;
+        boolean wasInside = rescue.isInEvacuationZone(centerX(), centerY());
         if (xAxis) player.x = MathUtils.clamp(player.x + amount, 0f, mapWidth - player.width);
         else player.y = MathUtils.clamp(player.y + amount, 0f, mapHeight - player.height);
+        boolean isInside = rescue.isInEvacuationZone(centerX(), centerY());
+        if (wasInside != isInside && !evacuationGate.contains(centerX(), centerY())
+                && !evacuationGate.contains(oldX + player.width / 2f, oldY + player.height / 2f)) {
+            player.setPosition(oldX, oldY);
+            return;
+        }
         for (Rectangle wall : walls) {
             if (player.overlaps(wall)) {
                 if (xAxis) player.x = amount > 0 ? wall.x - player.width : wall.x + wall.width;
